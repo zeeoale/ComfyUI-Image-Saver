@@ -36,6 +36,7 @@ You can use following placeholders:
 - `%steps`
 - `%cfg`
 - `%scheduler`
+- `%denoise`
 - `%time` *– format taken from `time_format`*
 - `%model` *– full name of model file*
 - `%basemodelname` *– name of model (without file extension)*
