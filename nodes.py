@@ -302,6 +302,7 @@ class ImageSaveWithMetadata:
             cfg,
             scheduler,
             basemodelname,
+            denoise,
         )
 
         path = make_pathname(
