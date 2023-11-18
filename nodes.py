@@ -1,6 +1,7 @@
 import os
 import hashlib
 from datetime import datetime
+from sys import float_info
 import json
 import piexif
 import piexif.helper
@@ -56,6 +57,7 @@ def make_pathname(
         cfg,
         scheduler,
         basemodelname,
+        denoise,
 ):
     filename = filename.replace("%date", get_timestamp("%Y-%m-%d"))
     filename = filename.replace("%time", get_timestamp(time_format))
@@ -67,6 +69,7 @@ def make_pathname(
     filename = filename.replace("%cfg", str(cfg))
     filename = filename.replace("%scheduler", scheduler)
     filename = filename.replace("%basemodelname", basemodelname)
+    filename = filename.replace("%denoise", str(denoise))
     return filename
 
 
@@ -81,6 +84,7 @@ def make_filename(
         cfg,
         scheduler,
         basemodelname,
+        denoise,
 ):
     filename = make_pathname(
         filename,
@@ -93,6 +97,7 @@ def make_filename(
         cfg,
         scheduler,
         basemodelname,
+        denoise,
     )
 
     return get_timestamp(time_format) if filename == "" else filename
@@ -148,6 +153,18 @@ class IntLiteral:
 
     def get_int(self, int):
         return (int,)
+
+class FloatLiteral:
+    RETURN_TYPES = ("FLOAT",)
+    FUNCTION = "get_float"
+    CATEGORY = "ImageSaverTools/utils"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"float": ("FLOAT", {"default": 1.0, "min": float_info.min, "max": float_info.max, "step": 0.01})}}
+
+    def get_float(self, float):
+        return (float,)
 
 
 class CfgLiteral:
@@ -232,6 +249,7 @@ class ImageSaveWithMetadata:
                 "lossless_webp": ("BOOLEAN", {"default": True}),
                 "quality_jpeg_or_webp": ("INT", {"default": 100, "min": 1, "max": 100}),
                 "counter": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff }),
+                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
             },
             "hidden": {
@@ -267,6 +285,7 @@ class ImageSaveWithMetadata:
             path,
             extension,
             time_format,
+            denoise,
             prompt=None,
             extra_pnginfo=None,
     ):
@@ -296,6 +315,7 @@ class ImageSaveWithMetadata:
             cfg,
             scheduler,
             basemodelname,
+            denoise,
         )
 
         ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
@@ -360,4 +380,5 @@ NODE_CLASS_MAPPINGS = {
     "Width/Height Literal": SizeLiteral,
     "Cfg Literal": CfgLiteral,
     "Int Literal": IntLiteral,
+    "Float Literal": FloatLiteral,
 }
