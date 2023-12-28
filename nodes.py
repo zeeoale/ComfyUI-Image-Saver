@@ -21,13 +21,28 @@ def parse_name(ckpt_name):
     return filename
 
 
-def calculate_sha256(file_path):
-    sha256_hash = hashlib.sha256()
+def get_sha256(file_path):
 
+    file_no_ext = os.path.splitext(file_path)[0]
+    hash_file = file_no_ext + ".sha256"
+
+    if os.path.exists(hash_file):
+        try:
+            with open(hash_file, "r") as f:
+                return f.read().strip()
+        except OSError as e:
+            print(f"comfy-image-saver: Error reading existing hash file: {e}")
+
+    sha256_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
-        # Read the file in chunks to avoid loading the entire file into memory
         for byte_block in iter(lambda: f.read(4096), b""):
             sha256_hash.update(byte_block)
+
+    try:
+        with open(hash_file, "w") as f:
+            f.write(sha256_hash.hexdigest())
+    except OSError as e:
+        print(f"comfy-image-saver: Error writing hash to {hash_file}: {e}")
 
     return sha256_hash.hexdigest()
 
@@ -355,7 +370,7 @@ class ImageSaveWithMetadata:
         )
 
         ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
-        modelhash = calculate_sha256(ckpt_path)[:10]
+        modelhash = get_sha256(ckpt_path)[:10]
         civitai_sampler_name = self.get_civitai_sampler_name(sampler_name, scheduler)
         comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Version: ComfyUI"
         output_path = os.path.join(self.output_dir, path)
