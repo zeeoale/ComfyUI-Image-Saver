@@ -225,6 +225,41 @@ class SchedulerSelector:
 class ImageSaveWithMetadata:
     def __init__(self):
         self.output_dir = folder_paths.output_directory
+        self.civitai_sampler_map = {
+            'euler_ancestral': 'Euler a',
+            'euler': 'Euler',
+            'lms': 'LMS',
+            'heun': 'Heun',
+            'dpm_2': 'DPM2',
+            'dpm_2_ancestral': 'DPM2 a',
+            'dpmpp_2s_ancestral': 'DPM++ 2S a',
+            'dpmpp_2m': 'DPM++ 2M',
+            'dpmpp_sde': 'DPM++ SDE',
+            'dpmpp_sde_gpu': 'DPM++ SDE',
+            'dpmpp_2m_sde': 'DPM++ 2M SDE',
+            'dpm_fast': 'DPM fast',
+            'dpm_adaptive': 'DPM adaptive',
+            'ddim': 'DDIM',
+            'plms': 'PLMS',
+            'uni_pc_bh2': 'UniPC',
+            'uni_pc': 'UniPC',
+            'lcm': 'LCM',
+        }
+
+    def get_civitai_sampler_name(self, sampler_name, scheduler):
+        # based on: https://github.com/civitai/civitai/blob/main/src/server/common/constants.ts#L122
+        if sampler_name in self.civitai_sampler_map:
+            civitai_name = self.civitai_sampler_map[sampler_name]
+
+            if scheduler == "karras":
+                civitai_name += " Karras"
+
+            return civitai_name
+        else:
+            if scheduler != 'normal':
+                return f"{sampler_name}_{scheduler}"
+            else:
+                return sampler_name
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -321,13 +356,14 @@ class ImageSaveWithMetadata:
 
         ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
         modelhash = calculate_sha256(ckpt_path)[:10]
-        comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {sampler_name}{f'_{scheduler}' if scheduler != 'normal' else ''}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Version: ComfyUI"
+        civitai_sampler_name = self.get_civitai_sampler_name(sampler_name, scheduler)
+        comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Version: ComfyUI"
         output_path = os.path.join(self.output_dir, path)
 
         if output_path.strip() != '':
             if not os.path.exists(output_path.strip()):
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
-                os.makedirs(output_path, exist_ok=True)    
+                os.makedirs(output_path, exist_ok=True)
 
         filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, prompt, extra_pnginfo)
 
