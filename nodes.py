@@ -425,14 +425,14 @@ class ImageSaver:
 
 
 NODE_CLASS_MAPPINGS = {
-    "Checkpoint Selector": CheckpointSelector,
-    "Save Image w/Metadata": ImageSaveWithMetadata,
-    "Sampler Selector": SamplerSelector,
-    "Scheduler Selector": SchedulerSelector,
-    "Seed Generator": SeedGenerator,
-    "String Literal": StringLiteral,
-    "Width/Height Literal": SizeLiteral,
-    "Cfg Literal": CfgLiteral,
-    "Int Literal": IntLiteral,
-    "Float Literal": FloatLiteral,
+    "Checkpoint Selector (Image Saver)": CheckpointSelector,
+    "Image Saver": ImageSaver,
+    "Sampler Selector (Image Saver)": SamplerSelector,
+    "Scheduler Selector (Image Saver)": SchedulerSelector,
+    "Seed Generator (Image Saver)": SeedGenerator,
+    "String Literal (Image Saver)": StringLiteral,
+    "Width/Height Literal (Image Saver)": SizeLiteral,
+    "Cfg Literal (Image Saver)": CfgLiteral,
+    "Int Literal (Image Saver)": IntLiteral,
+    "Float Literal (Image Saver)": FloatLiteral,
 }
