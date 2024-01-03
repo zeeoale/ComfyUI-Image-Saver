@@ -1,3 +1,5 @@
+[!] Forked from https://github.com/giriss/comfy-image-saver, which seems to be inactive since a while.
+
 # Save image with generation metadata on ComfyUI
 
 All the tools you need to save images with their **generation metadata** on ComfyUI. Compatible with *Civitai* & *Prompthero* geninfo auto-detection. Works with `png`, `jpeg` and `webp`.
@@ -9,7 +11,7 @@ You can find the example workflow file named `example-workflow.json`.
 ## How to install?
 
 ### Method 1: Easiest (Recommended)
-If you have *ComfyUI-Manager*, you can simply search "**Save Image with Generation Metadata**" and install these custom nodes 🎉
+If you have *ComfyUI-Manager*, you can simply search "**ComfyUI Image Saver**" and install these custom nodes.
 
 
 ### Method 2: Easy
@@ -19,7 +21,7 @@ If you don't have *ComfyUI-Manager*, then:
 - `git clone git@github.com:giriss/comfy-image-saver.git`
 - `cd comfy-image-saver`
 - `pip install -r requirements.txt`
-- Start/restart ComfyUI 🎉
+- Start/restart ComfyUI
 
 ## Autodetection in action
 
