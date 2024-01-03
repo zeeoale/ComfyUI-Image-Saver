@@ -298,6 +298,7 @@ class ImageSaveWithMetadata:
                 "height": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 8}),
                 "lossless_webp": ("BOOLEAN", {"default": True}),
                 "quality_jpeg_or_webp": ("INT", {"default": 100, "min": 1, "max": 100}),
+                "optimize_png": ("BOOLEAN", {"default": False}),
                 "counter": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff }),
                 "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
@@ -328,6 +329,7 @@ class ImageSaveWithMetadata:
             modelname,
             quality_jpeg_or_webp,
             lossless_webp,
+            optimize_png,
             width,
             height,
             counter,
@@ -380,12 +382,12 @@ class ImageSaveWithMetadata:
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, prompt, extra_pnginfo)
+        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo)
 
         subfolder = os.path.normpath(path)
         return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
 
-    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, prompt=None, extra_pnginfo=None) -> list[str]:
+    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt=None, extra_pnginfo=None) -> list[str]:
         img_count = 1
         paths = list()
         for image in images:
@@ -405,7 +407,7 @@ class ImageSaveWithMetadata:
                         metadata.add_text(x, json.dumps(extra_pnginfo[x]))
 
                 filename = f"{filename_prefix}.png"
-                img.save(os.path.join(output_path, filename), pnginfo=metadata, optimize=True)
+                img.save(os.path.join(output_path, filename), pnginfo=metadata, optimize=optimize_png)
             else:
                 filename = f"{filename_prefix}.{extension}"
                 file = os.path.join(output_path, filename)
