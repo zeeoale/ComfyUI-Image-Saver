@@ -15,7 +15,7 @@ class PromptMetadataExtractor:
     # Anything that follows embedding:<characters except , or whitespace
     EMBEDDING = r'embedding:([^,\s\(\)\:]+)'
     # Anything that follows <lora:NAME> with allowance for :weight, :weight.fractal or LBW
-    LORA = r'<lora:([^>:]+)(?::.+)?>'
+    LORA = r'<lora:([^>:]+)(?::[^>]+)?>'
 
     def __init__(self, prompts: List[str]):
         self.__embeddings = {}
