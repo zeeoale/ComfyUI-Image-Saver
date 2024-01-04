@@ -255,7 +255,7 @@ class ImageSaver:
         return {
             "required": {
                 "images": ("IMAGE", ),
-                "filename": ("STRING", {"default": f'%time_%seed', "multiline": False}),
+                "filename": ("STRING", {"default": f'%time_%basemodelname_%seed', "multiline": False}),
                 "path": ("STRING", {"default": '', "multiline": False}),
                 "extension": (['png', 'jpeg', 'webp'],),
                 "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
