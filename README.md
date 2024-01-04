@@ -2,46 +2,48 @@
 
 # Save image with generation metadata in ComfyUI
 
-Allows you to save images with their **generation metadata**. Includes the metadata compatible with *Civitai* & *Prompthero* geninfo auto-detection. Works with PNG, JPG and WEBP. For PNG stores both the full workflow in comfy format, plus a1111-style parameters. For JPEG/WEBP only the a1111-style parameters are stored.
+Allows you to save images with their **generation metadata**. Includes the metadata compatible with *Civitai* & *Prompthero* geninfo auto-detection. Works with PNG, JPG and WEBP. For PNG stores both the full workflow in comfy format, plus a1111-style parameters. For JPEG/WEBP only the a1111-style parameters are stored. Can include hashes of LoRAs and embeddings for proper resource linking on civitai.
 
 You can find the example workflow file named `example-workflow.json`.
 
-![example-workflow](https://github.com/giriss/comfy-image-saver/assets/2811408/e231237b-f91a-4679-b3ae-2618080c8e39)
+![workflow](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/af1e30b4-af4b-426c-8739-b0ef4318ec85)
+
+You can also add LoRAs to the prompt in \<lora:name:1.0\> format, which would be translated into hashes and stored together with the metadata. For this it is recommended to use `ImpactWildcardEncode` from the fantastic [ComfyUI-Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack). It will allow you to convert the LoRAs directly to proper conditioning without having to worry about avoiding/concatenating lora strings, which have no effect in standard conditioning nodes. Here is an example:
+
+![workflow(1)](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/cc103971-2040-4b37-9d72-5bcf26276fc9)
+
+This would have civitai autodetect all of the resources (assuming the model/lora/embedding hashes match):
+![image](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/f0642389-4f34-4a64-89a6-5cf9c33d5ed1)
 
 ## How to install?
 
-### Method 1: Easiest (Recommended)
+### Method 1: Manager (Recommended)
 If you have *ComfyUI-Manager*, you can simply search "**ComfyUI Image Saver**" and install these custom nodes.
-
 
 ### Method 2: Easy
 If you don't have *ComfyUI-Manager*, then:
 - Using CLI, go to the ComfyUI folder
 - `cd custom_nodes`
-- `git clone git@github.com:giriss/comfy-image-saver.git`
-- `cd comfy-image-saver`
+- `git clone git@github.com:alexopus/ComfyUI-Image-Saver.git`
+- `cd ComfyUI-Image-Saver`
 - `pip install -r requirements.txt`
 - Start/restart ComfyUI
-
-## Autodetection in action
-
-![Screenshot 2023-08-17 at 13 15 18](https://github.com/giriss/comfy-image-saver/assets/2811408/785f2475-8f9a-45c9-9d38-855161a98495)
 
 ## Customization of file/folder names
 
 You can use following placeholders:
 
 - `%date`
-- `%seed`
-- `%counter`
-- `%sampler_name`
-- `%steps`
-- `%cfg`
-- `%scheduler`
-- `%denoise`
 - `%time` *– format taken from `time_format`*
 - `%model` *– full name of model file*
 - `%basemodelname` *– name of model (without file extension)*
+- `%seed`
+- `%counter`
+- `%sampler_name`
+- `%scheduler`
+- `%steps`
+- `%cfg`
+- `%denoise`
 
 Example:
 
