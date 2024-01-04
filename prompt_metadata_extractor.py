@@ -40,7 +40,6 @@ class PromptMetadataExtractor:
     def __perform(self, prompts):
         for prompt in prompts:
             embeddings = re.findall(self.EMBEDDING, prompt, re.IGNORECASE | re.MULTILINE)
-            
             for embedding in embeddings:
                 self.__extract_embedding_information(embedding)
             
