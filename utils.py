@@ -1,13 +1,12 @@
 import os
 import hashlib
-from typing import AnyStr
 import folder_paths
 
 """
 Given the file path, finds a matching sha256 file, or creates one
 based on the headers in the source file
 """
-def get_sha256(file_path: AnyStr):
+def get_sha256(file_path: str):
     file_no_ext = os.path.splitext(file_path)[0]
     hash_file = file_no_ext + ".sha256"
 
@@ -34,20 +33,20 @@ def get_sha256(file_path: AnyStr):
 """
 Represent the given embedding name as key as detected by civitAI
 """
-def civitai_embedding_key_name(embedding: AnyStr):
+def civitai_embedding_key_name(embedding: str):
     return f'embed:{embedding}'
 
 """
 Represent the given lora name as key as detected by civitAI
 NB: this should also work fine for Lycoris
 """
-def civitai_lora_key_name(lora: AnyStr):
+def civitai_lora_key_name(lora: str):
     return f'LORA:{lora}'
 
 """
 Based on a embedding name, eg: EasyNegative, finds the path as known in comfy, including extension
 """
-def full_embedding_path_for(embedding: AnyStr):
+def full_embedding_path_for(embedding: str):
     matching_embedding = next((x for x in __list_embeddings() if x.startswith(embedding)), None)
     if matching_embedding == None:
         return None
@@ -56,7 +55,7 @@ def full_embedding_path_for(embedding: AnyStr):
 """
 Based on a lora name, eg: epi_noise_offset2, finds the path as known in comfy, including extension
 """
-def full_lora_path_for(lora: AnyStr):
+def full_lora_path_for(lora: str):
     matching_lora = next((x for x in __list_loras() if x.startswith(lora)), None)
     if matching_lora == None:
         return None
