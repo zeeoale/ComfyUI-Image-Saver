@@ -8,7 +8,7 @@ You can find the example workflow file named `example-workflow.json`.
 
 ![workflow](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/af1e30b4-af4b-426c-8739-b0ef4318ec85)
 
-You can also add LoRAs to the prompt in \<lora:name:1.0\> format, which would be translated into hashes and stored together with the metadata. For this it is recommended to use `ImpactWildcardEncode` from the fantastic [ComfyUI-Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack). It will allow you to convert the LoRAs directly to proper conditioning without having to worry about avoiding/concatenating lora strings, which have no effect in standard conditioning nodes. Here is an example:
+You can also add LoRAs to the prompt in \<lora:name:weight\> format, which would be translated into hashes and stored together with the metadata. For this it is recommended to use `ImpactWildcardEncode` from the fantastic [ComfyUI-Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack). It will allow you to convert the LoRAs directly to proper conditioning without having to worry about avoiding/concatenating lora strings, which have no effect in standard conditioning nodes. Here is an example:
 
 ![workflow(1)](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/cc103971-2040-4b37-9d72-5bcf26276fc9)
 
