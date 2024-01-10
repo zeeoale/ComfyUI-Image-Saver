@@ -15,7 +15,7 @@ def get_sha256(file_path: str):
             with open(hash_file, "r") as f:
                 return f.read().strip()
         except OSError as e:
-            print(f"comfy-image-saver: Error reading existing hash file: {e}")
+            print(f"ComfyUI-Image-Saver: Error reading existing hash file: {e}")
 
     sha256_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
@@ -26,7 +26,7 @@ def get_sha256(file_path: str):
         with open(hash_file, "w") as f:
             f.write(sha256_hash.hexdigest())
     except OSError as e:
-        print(f"comfy-image-saver: Error writing hash to {hash_file}: {e}")
+        print(f"ComfyUI-Image-Saver: Error writing hash to {hash_file}: {e}")
 
     return sha256_hash.hexdigest()
 
@@ -56,8 +56,13 @@ def full_embedding_path_for(embedding: str):
 Based on a lora name, eg: epi_noise_offset2, finds the path as known in comfy, including extension
 """
 def full_lora_path_for(lora: str):
-    matching_lora = next((x for x in __list_loras() if x.startswith(lora)), None)
+    # if no supported extensions is given, add .safetensors
+    if (lora.split('.')[-1]) not in folder_paths.supported_pt_extensions:
+        lora = lora + ".safetensors"
+
+    matching_lora = next((x for x in __list_loras() if x.endwith(lora)), None)
     if matching_lora == None:
+        print(f'ComfyUI-Image-Saver: could not find full path to lora "{lora}"')
         return None
     return folder_paths.get_full_path("loras", matching_lora)
 
