@@ -60,7 +60,7 @@ def full_lora_path_for(lora: str):
     if (lora.split('.')[-1]) not in folder_paths.supported_pt_extensions:
         lora = lora + ".safetensors"
 
-    matching_lora = next((x for x in __list_loras() if x.endwith(lora)), None)
+    matching_lora = next((x for x in __list_loras() if x.endswith(lora)), None)
     if matching_lora == None:
         print(f'ComfyUI-Image-Saver: could not find full path to lora "{lora}"')
         return None
