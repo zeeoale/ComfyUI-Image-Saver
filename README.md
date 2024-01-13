@@ -6,7 +6,7 @@ Allows you to save images with their **generation metadata**. Includes the metad
 
 You can find the example workflow file named `example-workflow.json`.
 
-![workflow](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/af1e30b4-af4b-426c-8739-b0ef4318ec85)
+![workflow](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/426559e4-92e1-414d-a665-82312b279830)
 
 You can also add LoRAs to the prompt in \<lora:name:weight\> format, which would be translated into hashes and stored together with the metadata. For this it is recommended to use `ImpactWildcardEncode` from the fantastic [ComfyUI-Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack). It will allow you to convert the LoRAs directly to proper conditioning without having to worry about avoiding/concatenating lora strings, which have no effect in standard conditioning nodes. Here is an example:
 
