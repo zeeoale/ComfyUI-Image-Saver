@@ -1,4 +1,4 @@
-# Untagged
+# v1.0.0
 
 - **BREAKING CHANGE**: Convert CheckpointSelector to CheckpointLoaderWithName (571fcfa319438a32e051f90b32827363bccbd2ef). Fixes 2 issues:
     - oversized search fields (https://github.com/giriss/comfy-image-saver/issues/5)
