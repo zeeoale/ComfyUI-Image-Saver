@@ -10,7 +10,7 @@ You can find the example workflow file named `example-workflow.json`.
 
 You can also add LoRAs to the prompt in \<lora:name:weight\> format, which would be translated into hashes and stored together with the metadata. For this it is recommended to use `ImpactWildcardEncode` from the fantastic [ComfyUI-Impact-Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack). It will allow you to convert the LoRAs directly to proper conditioning without having to worry about avoiding/concatenating lora strings, which have no effect in standard conditioning nodes. Here is an example:
 
-![workflow(1)](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/cc103971-2040-4b37-9d72-5bcf26276fc9)
+![workflow(1)](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/11c8de09-5207-4d54-b879-23b0163dc362)
 
 This would have civitai autodetect all of the resources (assuming the model/lora/embedding hashes match):
 ![image](https://github.com/alexopus/ComfyUI-Image-Saver/assets/25933468/f0642389-4f34-4a64-89a6-5cf9c33d5ed1)
