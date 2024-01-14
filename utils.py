@@ -53,15 +53,20 @@ def full_embedding_path_for(embedding: str):
     return folder_paths.get_full_path("embeddings", matching_embedding)
 
 """
-Based on a lora name, eg: epi_noise_offset2, finds the path as known in comfy, including extension
+Based on a lora name, e.g., 'epi_noise_offset2', finds the path as known in comfy, including extension.
 """
 def full_lora_path_for(lora: str):
-    # if no supported extensions is given, add .safetensors
-    if (lora.split('.')[-1]) not in folder_paths.supported_pt_extensions:
-        lora = lora + ".safetensors"
+    # Find the position of the last dot
+    last_dot_position = lora.rfind('.')
+    # Get the extension including the dot
+    extension = lora[last_dot_position:] if last_dot_position != -1 else ""
+    # Check if the extension is supported, if not, add .safetensors
+    if extension not in folder_paths.supported_pt_extensions:
+        lora += ".safetensors"
 
+    # Find the matching lora path
     matching_lora = next((x for x in __list_loras() if x.endswith(lora)), None)
-    if matching_lora == None:
+    if matching_lora is None:
         print(f'ComfyUI-Image-Saver: could not find full path to lora "{lora}"')
         return None
     return folder_paths.get_full_path("loras", matching_lora)
