@@ -35,6 +35,17 @@ def get_timestamp(time_format):
 
     return timestamp
 
+def save_json(image_info, filename):
+    try:
+        workflow = (image_info or {}).get('workflow')
+        if workflow is None:
+            print('No image info found, skipping saving of JSON')
+        with open(f'{filename}.json', 'w') as workflow_file:
+            json.dump(workflow, workflow_file)
+            print(f'Saved workflow to {filename}.json')
+    except:
+        print('Failed to save workflow as json, proceeding remainder of saving execution')
+
 
 def make_pathname(filename, seed, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise):
     filename = filename.replace("%date", get_timestamp("%Y-%m-%d"))
@@ -236,6 +247,7 @@ class ImageSaver:
                 "counter": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff }),
                 "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
+                "save_workflow_as_json": ("BOOLEAN", {"default": False}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -272,6 +284,7 @@ class ImageSaver:
             extension,
             time_format,
             denoise,
+            save_workflow_as_json=False,
             prompt=None,
             extra_pnginfo=None,
     ):
@@ -289,6 +302,8 @@ class ImageSaver:
         basemodelname = parse_checkpoint_name_without_extension(modelname)
         comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Hashes: {extension_hashes} Version: ComfyUI"
         output_path = os.path.join(self.output_dir, path)
+        if save_workflow_as_json:
+          save_json(extra_pnginfo, os.path.join(output_path, filename))
 
         if output_path.strip() != '':
             if not os.path.exists(output_path.strip()):
