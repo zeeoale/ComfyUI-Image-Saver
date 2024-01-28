@@ -1,4 +1,4 @@
-# untagged
+# v1.1.0
 
 -  Fix extension check in full_lora_path_for
 -  add 'save_workflow_as_json', which allows saving an additional file with the json workflow included
