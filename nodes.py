@@ -43,8 +43,8 @@ def save_json(image_info, filename):
         with open(f'{filename}.json', 'w') as workflow_file:
             json.dump(workflow, workflow_file)
             print(f'Saved workflow to {filename}.json')
-    except:
-        print('Failed to save workflow as json, proceeding remainder of saving execution')
+    except Exception as e:
+        print(f'Failed to save workflow as json due to: {e}, proceeding with the remainder of saving execution')
 
 
 def make_pathname(filename, seed, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise):
