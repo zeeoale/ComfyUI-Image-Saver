@@ -302,20 +302,18 @@ class ImageSaver:
         basemodelname = parse_checkpoint_name_without_extension(modelname)
         comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Hashes: {extension_hashes} Version: ComfyUI"
         output_path = os.path.join(self.output_dir, path)
-        if save_workflow_as_json:
-          save_json(extra_pnginfo, os.path.join(output_path, filename))
 
         if output_path.strip() != '':
             if not os.path.exists(output_path.strip()):
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo)
+        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json)
 
         subfolder = os.path.normpath(path)
         return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
 
-    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt=None, extra_pnginfo=None) -> list[str]:
+    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json) -> list[str]:
         img_count = 1
         paths = list()
         for image in images:
@@ -349,6 +347,9 @@ class ImageSaver:
                     },
                 })
                 piexif.insert(exif_bytes, file)
+
+            if save_workflow_as_json:
+                save_json(extra_pnginfo, os.path.join(output_path, current_filename_prefix))
 
             paths.append(filename)
             img_count += 1
