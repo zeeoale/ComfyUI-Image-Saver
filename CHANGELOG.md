@@ -1,3 +1,8 @@
+# unreleased
+
+- Fix suffix for batches
+- Save json for each image in batch
+
 # v1.1.0
 
 -  Fix extension check in full_lora_path_for
