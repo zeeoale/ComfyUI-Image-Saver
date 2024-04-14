@@ -321,8 +321,11 @@ class ImageSaver:
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+
             if images.size()[0] > 1:
-                filename_prefix += "_{:02d}".format(img_count)
+                current_filename_prefix = "{}_{:02d}".format(filename_prefix, img_count)
+            else:
+                current_filename_prefix = filename_prefix
 
             if extension == 'png':
                 metadata = PngInfo()
@@ -334,10 +337,10 @@ class ImageSaver:
                     for x in extra_pnginfo:
                         metadata.add_text(x, json.dumps(extra_pnginfo[x]))
 
-                filename = f"{filename_prefix}.png"
+                filename = f"{current_filename_prefix}.png"
                 img.save(os.path.join(output_path, filename), pnginfo=metadata, optimize=optimize_png)
             else:
-                filename = f"{filename_prefix}.{extension}"
+                filename = f"{current_filename_prefix}.{extension}"
                 file = os.path.join(output_path, filename)
                 img.save(file, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
                 exif_bytes = piexif.dump({
