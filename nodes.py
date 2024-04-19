@@ -292,7 +292,12 @@ class ImageSaver:
         filename = make_filename(filename, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise)
         path = make_pathname(path, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise)
         ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
-        modelhash = get_sha256(ckpt_path)[:10]
+
+        if ckpt_path:
+            modelhash = get_sha256(ckpt_path)[:10]
+        else:
+            modelhash = ""
+
         metadata_extractor = PromptMetadataExtractor([positive, negative])
         embeddings = metadata_extractor.get_embeddings()
         loras = metadata_extractor.get_loras()
