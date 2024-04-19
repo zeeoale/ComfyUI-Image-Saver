@@ -2,6 +2,7 @@
 
 - Fix suffix for batches
 - Save json for each image in batch
+- Allow to leave modelname empty
 
 # v1.1.0
 
