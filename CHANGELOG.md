@@ -1,5 +1,7 @@
 # unreleased
 
+- added dpmpp_3m_sde sampler
+- added exponential scheduler
 - Fix suffix for batches
 - Save json for each image in batch
 - Allow to leave modelname empty
