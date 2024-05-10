@@ -1,5 +1,6 @@
 # unreleased
 
+- Add 'AYS SDXL', 'AYS SD1' and 'AYS SVD' to scheduler selectors
 - added dpmpp_3m_sde sampler
 - added exponential scheduler
 - Fix suffix for batches
