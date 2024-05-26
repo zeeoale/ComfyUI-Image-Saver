@@ -171,8 +171,8 @@ class SamplerSelector:
 
 class SchedulerSelector:
     CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],)
-    RETURN_NAMES = ("scheduler",)
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'], "STRING",)
+    RETURN_NAMES = ("scheduler", "scheduler_name")
     FUNCTION = "get_names"
 
     @classmethod
@@ -180,7 +180,33 @@ class SchedulerSelector:
         return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],)}}
 
     def get_names(self, scheduler):
-        return (scheduler,)
+        return (scheduler, scheduler)
+
+class SchedulerSelectorComfy:
+    CATEGORY = 'ImageSaver/utils'
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING",)
+    RETURN_NAMES = ("scheduler", "scheduler_name")
+    FUNCTION = "get_names"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
+
+    def get_names(self, scheduler):
+        return (scheduler, scheduler)
+
+class SchedulerSelectorComfy:
+    CATEGORY = 'ImageSaver/utils'
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING",)
+    RETURN_NAMES = ("scheduler", "scheduler_name")
+    FUNCTION = "get_names"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
+
+    def get_names(self, scheduler):
+        return (scheduler, scheduler)
 
 class ImageSaver:
     def __init__(self):
@@ -235,7 +261,7 @@ class ImageSaver:
                 "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0}),
                 "modelname": ("STRING", {"default": '', "multiline": False}),
                 "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],),
+                "scheduler": ("STRING", {"default": 'normal', "multiline": False}),
             },
             "optional": {
                 "positive": ("STRING", {"default": 'unknown', "multiline": True}),
@@ -372,6 +398,7 @@ NODE_CLASS_MAPPINGS = {
     "Image Saver": ImageSaver,
     "Sampler Selector (Image Saver)": SamplerSelector,
     "Scheduler Selector (Image Saver)": SchedulerSelector,
+    "Scheduler Selector (Comfy) (Image Saver)": SchedulerSelectorComfy,
     "Seed Generator (Image Saver)": SeedGenerator,
     "String Literal (Image Saver)": StringLiteral,
     "Width/Height Literal (Image Saver)": SizeLiteral,
