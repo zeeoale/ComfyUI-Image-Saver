@@ -276,7 +276,7 @@ class ImageSaver:
                 "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False}),
-                "embed_workflow": ("BOOLEAN", {"default": True}),
+                "embed_workflow_in_png": ("BOOLEAN", {"default": True}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -314,7 +314,7 @@ class ImageSaver:
             time_format,
             denoise,
             save_workflow_as_json=False,
-            embed_workflow=True,
+            embed_workflow_in_png=True,
             prompt=None,
             extra_pnginfo=None,
     ):
@@ -343,12 +343,12 @@ class ImageSaver:
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json,embed_workflow)
+        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png)
 
         subfolder = os.path.normpath(path)
         return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
 
-    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json,embed_workflow) -> list[str]:
+    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png) -> list[str]:
         img_count = 1
         paths = list()
         for image in images:
@@ -364,8 +364,8 @@ class ImageSaver:
                 metadata = PngInfo()
                 metadata.add_text("parameters", comment)
 
-                # embed workflow and prompt json only if embed_workflow is true
-                if embed_workflow:
+                # embed workflow and prompt json only if embed_workflow_in_png is true
+                if embed_workflow_in_png:
                     if prompt is not None:
                         metadata.add_text("prompt", json.dumps(prompt))
                     if extra_pnginfo is not None:
