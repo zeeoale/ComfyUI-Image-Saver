@@ -208,6 +208,32 @@ class SchedulerSelectorComfy:
     def get_names(self, scheduler):
         return (scheduler, scheduler)
 
+class SchedulerToString:
+    CATEGORY = 'ImageSaver/utils'
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("scheduler_name")
+    FUNCTION = "get_name"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],)}}
+
+    def get_names(self, scheduler):
+        return (scheduler)
+
+class SchedulerComfyToString:
+    CATEGORY = 'ImageSaver/utils'
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("scheduler_name")
+    FUNCTION = "get_name"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
+
+    def get_names(self, scheduler):
+        return (scheduler)
+
 class ImageSaver:
     def __init__(self):
         self.output_dir = folder_paths.output_directory
@@ -405,4 +431,6 @@ NODE_CLASS_MAPPINGS = {
     "Cfg Literal (Image Saver)": CfgLiteral,
     "Int Literal (Image Saver)": IntLiteral,
     "Float Literal (Image Saver)": FloatLiteral,
+    "SchedulerToString (Image Saver)": SchedulerToString,
+    "SchedulerComfyToString (Image Saver)": SchedulerComfyToString,
 }
