@@ -1,6 +1,6 @@
 # unreleased
 
-- Add option to strip positive/negative prompt from the a1111 parameters comment
+- Add option to strip positive/negative prompt from the a1111 parameters comment (hashes for loras/embeddings are still always added)
 - Add option for embedding prompt/workflow in PNG
 - Add 'AYS SDXL', 'AYS SD1' and 'AYS SVD' to scheduler selectors
 - added dpmpp_3m_sde sampler
