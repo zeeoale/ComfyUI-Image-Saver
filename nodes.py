@@ -283,13 +283,13 @@ class ImageSaver:
                 "filename": ("STRING", {"default": f'%time_%basemodelname_%seed', "multiline": False}),
                 "path": ("STRING", {"default": '', "multiline": False}),
                 "extension": (['png', 'jpeg', 'webp'],),
+            },
+            "optional": {
                 "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0}),
+                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
                 "modelname": ("STRING", {"default": '', "multiline": False}),
                 "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
                 "scheduler": ("STRING", {"default": 'normal', "multiline": False}),
-            },
-            "optional": {
                 "positive": ("STRING", {"default": 'unknown', "multiline": True}),
                 "negative": ("STRING", {"default": 'unknown', "multiline": True}),
                 "seed_value": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
