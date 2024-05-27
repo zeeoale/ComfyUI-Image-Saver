@@ -303,6 +303,7 @@ class ImageSaver:
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False}),
                 "embed_workflow_in_png": ("BOOLEAN", {"default": True}),
+                "strip_a1111_params": (['nothing', 'positive prompt', 'negative prompt', 'positive and negative prompt'],),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -341,6 +342,7 @@ class ImageSaver:
             denoise,
             save_workflow_as_json=False,
             embed_workflow_in_png=True,
+            strip_a1111_params='nothing',
             prompt=None,
             extra_pnginfo=None,
     ):
@@ -361,7 +363,11 @@ class ImageSaver:
 
         extension_hashes = json.dumps(embeddings | loras | { "model": modelhash })
         basemodelname = parse_checkpoint_name_without_extension(modelname)
-        comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Hashes: {extension_hashes} Version: ComfyUI"
+
+        positive_a111_params = handle_whitespace(positive) if strip_a1111_params not in ["positive prompt", "positive and negative prompt"] else ""
+        negative_a111_params = f"\nNegative prompt: {handle_whitespace(negative)}" if strip_a1111_params not in ["negative prompt", "positive and negative prompt"] else ""
+        a111_params = f"{positive_a111_params}{negative_a111_params}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Hashes: {extension_hashes}, Version: ComfyUI"
+
         output_path = os.path.join(self.output_dir, path)
 
         if output_path.strip() != '':
@@ -369,12 +375,12 @@ class ImageSaver:
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png)
+        filenames = self.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png)
 
         subfolder = os.path.normpath(path)
         return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
 
-    def save_images(self, images, output_path, filename_prefix, comment, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png) -> list[str]:
+    def save_images(self, images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png) -> list[str]:
         img_count = 1
         paths = list()
         for image in images:
@@ -388,7 +394,7 @@ class ImageSaver:
 
             if extension == 'png':
                 metadata = PngInfo()
-                metadata.add_text("parameters", comment)
+                metadata.add_text("parameters", a111_params)
 
                 # embed workflow and prompt json only if embed_workflow_in_png is true
                 if embed_workflow_in_png:
@@ -406,7 +412,7 @@ class ImageSaver:
                 img.save(file, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
                 exif_bytes = piexif.dump({
                     "Exif": {
-                        piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(comment, encoding="unicode")
+                        piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
                     },
                 })
                 piexif.insert(exif_bytes, file)
