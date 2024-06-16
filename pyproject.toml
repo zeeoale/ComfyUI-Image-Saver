@@ -1,5 +1,5 @@
 [project]
-name = "ComfyUI-Image-Saver"
+name = "comfyui-image-saver"
 description = "Save images with generation metadata compatible with Civitai. Works with png, jpeg and webp. Stores LoRAs, models and embeddings hashes for resource recognition."
 version = "1.2.0"
 license = "LICENSE"
@@ -11,5 +11,5 @@ Repository = "https://github.com/alexopus/ComfyUI-Image-Saver"
 
 [tool.comfy]
 PublisherId = "alexopus"
-DisplayName = "ComfyUI-Image-Saver"
+DisplayName = "ComfyUI Image Saver"
 Icon = ""
