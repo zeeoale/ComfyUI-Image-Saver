@@ -1,3 +1,7 @@
+# v1.2.1
+
+- Update Impact Pack scheduler list
+
 # v1.2.0
 
 - Add option to strip positive/negative prompt from the a1111 parameters comment (hashes for loras/embeddings are still always added)
