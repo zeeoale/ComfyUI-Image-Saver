@@ -171,13 +171,13 @@ class SamplerSelector:
 
 class SchedulerSelector:
     CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'], "STRING",)
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], "STRING",)
     RETURN_NAMES = ("scheduler", "scheduler_name")
     FUNCTION = "get_names"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],)}}
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
 
     def get_names(self, scheduler):
         return (scheduler, scheduler)
@@ -216,7 +216,7 @@ class SchedulerToString:
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD'],)}}
+        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
 
     def get_names(self, scheduler):
         return (scheduler)
