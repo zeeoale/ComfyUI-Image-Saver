@@ -234,6 +234,19 @@ class SchedulerComfyToString:
     def get_names(self, scheduler):
         return (scheduler)
 
+class SamplerToString:
+    CATEGORY = 'ImageSaver/utils'
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("sampler_name")
+    FUNCTION = "get_name"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {"sampler": (comfy.samplers.KSampler.SAMPLERS,)}}
+
+    def get_names(self, sampler):
+        return (sampler)
+
 class ImageSaver:
     def __init__(self):
         self.output_dir = folder_paths.output_directory
