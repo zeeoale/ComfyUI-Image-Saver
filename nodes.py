@@ -288,7 +288,7 @@ class ImageSaver:
                 "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
                 "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
                 "modelname": ("STRING", {"default": '', "multiline": False}),
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
+                "sampler_name": ("STRING", {"default": '', "multiline": False}),
                 "scheduler": ("STRING", {"default": 'normal', "multiline": False}),
                 "positive": ("STRING", {"default": 'unknown', "multiline": True}),
                 "negative": ("STRING", {"default": 'unknown', "multiline": True}),
