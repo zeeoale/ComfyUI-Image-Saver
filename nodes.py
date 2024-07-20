@@ -452,4 +452,5 @@ NODE_CLASS_MAPPINGS = {
     "Float Literal (Image Saver)": FloatLiteral,
     "SchedulerToString (Image Saver)": SchedulerToString,
     "SchedulerComfyToString (Image Saver)": SchedulerComfyToString,
+    "SamplerToString (Image Saver)": SamplerToString,
 }
