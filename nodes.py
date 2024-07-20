@@ -218,7 +218,7 @@ class SchedulerToString:
     def INPUT_TYPES(cls):
         return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
 
-    def get_names(self, scheduler):
+    def get_name(self, scheduler):
         return (scheduler)
 
 class SchedulerComfyToString:
@@ -231,7 +231,7 @@ class SchedulerComfyToString:
     def INPUT_TYPES(cls):
         return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
 
-    def get_names(self, scheduler):
+    def get_name(self, scheduler):
         return (scheduler)
 
 class SamplerToString:
@@ -244,7 +244,7 @@ class SamplerToString:
     def INPUT_TYPES(cls):
         return {"required": {"sampler": (comfy.samplers.KSampler.SAMPLERS,)}}
 
-    def get_names(self, sampler):
+    def get_name(self, sampler):
         return (sampler)
 
 class ImageSaver:
