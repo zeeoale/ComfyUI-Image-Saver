@@ -219,7 +219,7 @@ class SchedulerToString:
         return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
 
     def get_name(self, scheduler):
-        return (scheduler)
+        return (scheduler,)
 
 class SchedulerComfyToString:
     CATEGORY = 'ImageSaver/utils'
@@ -232,7 +232,7 @@ class SchedulerComfyToString:
         return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
 
     def get_name(self, scheduler):
-        return (scheduler)
+        return (scheduler,)
 
 class SamplerToString:
     CATEGORY = 'ImageSaver/utils'
@@ -245,7 +245,7 @@ class SamplerToString:
         return {"required": {"sampler": (comfy.samplers.KSampler.SAMPLERS,)}}
 
     def get_name(self, sampler):
-        return (sampler)
+        return (sampler,)
 
 class ImageSaver:
     def __init__(self):
