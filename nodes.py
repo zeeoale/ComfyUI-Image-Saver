@@ -158,8 +158,8 @@ class CheckpointLoaderWithName:
 
 class SamplerSelector:
     CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SAMPLERS,)
-    RETURN_NAMES = ("sampler_name",)
+    RETURN_TYPES = (comfy.samplers.KSampler.SAMPLERS, "STRING")
+    RETURN_NAMES = ("sampler", "sampler_name")
     FUNCTION = "get_names"
 
     @classmethod
@@ -167,7 +167,7 @@ class SamplerSelector:
         return {"required": {"sampler_name": (comfy.samplers.KSampler.SAMPLERS,)}}
 
     def get_names(self, sampler_name):
-        return (sampler_name,)
+        return (sampler_name, sampler_name)
 
 class SchedulerSelector:
     CATEGORY = 'ImageSaver/utils'
