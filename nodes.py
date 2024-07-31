@@ -96,7 +96,7 @@ class SizeLiteral:
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"int": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 8})}}
+        return {"required": {"int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8})}}
 
     def get_int(self, int):
         return (int,)
@@ -306,8 +306,8 @@ class ImageSaver:
                 "positive": ("STRING", {"default": 'unknown', "multiline": True}),
                 "negative": ("STRING", {"default": 'unknown', "multiline": True}),
                 "seed_value": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "width": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 8}),
-                "height": ("INT", {"default": 512, "min": 1, "max": MAX_RESOLUTION, "step": 8}),
+                "width": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                "height": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
                 "lossless_webp": ("BOOLEAN", {"default": True}),
                 "quality_jpeg_or_webp": ("INT", {"default": 100, "min": 1, "max": 100}),
                 "optimize_png": ("BOOLEAN", {"default": False}),
