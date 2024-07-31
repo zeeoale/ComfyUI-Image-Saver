@@ -1,3 +1,7 @@
+# unreleased
+
+- Remove strip_a1111_params option
+
 # v1.3.0
 
 - Saver node: converted sampler input to string

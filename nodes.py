@@ -316,7 +316,6 @@ class ImageSaver:
                 "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False}),
                 "embed_workflow_in_png": ("BOOLEAN", {"default": True}),
-                "strip_a1111_params": (['nothing', 'positive prompt', 'negative prompt', 'positive and negative prompt'],),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -355,7 +354,6 @@ class ImageSaver:
             denoise,
             save_workflow_as_json=False,
             embed_workflow_in_png=True,
-            strip_a1111_params='nothing',
             prompt=None,
             extra_pnginfo=None,
     ):
@@ -377,8 +375,8 @@ class ImageSaver:
         extension_hashes = json.dumps(embeddings | loras | { "model": modelhash })
         basemodelname = parse_checkpoint_name_without_extension(modelname)
 
-        positive_a111_params = handle_whitespace(positive) if strip_a1111_params not in ["positive prompt", "positive and negative prompt"] else ""
-        negative_a111_params = f"\nNegative prompt: {handle_whitespace(negative)}" if strip_a1111_params not in ["negative prompt", "positive and negative prompt"] else ""
+        positive_a111_params = handle_whitespace(positive)
+        negative_a111_params = f"\nNegative prompt: {handle_whitespace(negative)}"
         a111_params = f"{positive_a111_params}{negative_a111_params}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Hashes: {extension_hashes}, Version: ComfyUI"
 
         output_path = os.path.join(self.output_dir, path)
