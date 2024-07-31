@@ -1,3 +1,11 @@
+# v1.3.0
+
+- Saver node: converted sampler input to string
+- SamplerSelector node: output sampler name also as a string
+- Add SamplerToString util node
+- Fixed converter nodes
+- Change min value for widgets with fixed steps
+
 # v1.2.1
 
 - Update Impact Pack scheduler list
