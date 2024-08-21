@@ -68,11 +68,17 @@ def make_filename(filename, seed, modelname, counter, time_format, sampler_name,
 class SeedGenerator:
     RETURN_TYPES = ("INT",)
     FUNCTION = "get_seed"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Provides seed as integer"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})}}
+        return {
+            "required": {
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+            }
+        }
 
     def get_seed(self, seed):
         return (seed,)
@@ -80,23 +86,36 @@ class SeedGenerator:
 class StringLiteral:
     RETURN_TYPES = ("STRING",)
     FUNCTION = "get_string"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Provides a string"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"string": ("STRING", {"default": "", "multiline": True})}}
+        return {
+            "required": {
+                "string": ("STRING", {"default": "", "multiline": True}),
+            }
+        }
 
     def get_string(self, string):
         return (string,)
 
 class SizeLiteral:
     RETURN_TYPES = ("INT",)
+    RETURN_NAMES = ("dimension",)
     FUNCTION = "get_int"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = f"Provides integer number between 0 and {MAX_RESOLUTION} (step=8)"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8})}}
+        return {
+            "required": {
+                "int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+            }
+        }
 
     def get_int(self, int):
         return (int,)
@@ -104,11 +123,17 @@ class SizeLiteral:
 class IntLiteral:
     RETURN_TYPES = ("INT",)
     FUNCTION = "get_int"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Provides integer number between 0 and 1000000"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"int": ("INT", {"default": 0, "min": 0, "max": 1000000})}}
+        return {
+            "required": {
+                "int": ("INT", {"default": 0, "min": 0, "max": 1000000}),
+            }
+        }
 
     def get_int(self, int):
         return (int,)
@@ -116,37 +141,55 @@ class IntLiteral:
 class FloatLiteral:
     RETURN_TYPES = ("FLOAT",)
     FUNCTION = "get_float"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = f"Provides a floating point number between {float_info.min} and {float_info.max} (step=0.01)"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"float": ("FLOAT", {"default": 1.0, "min": float_info.min, "max": float_info.max, "step": 0.01})}}
+        return {
+            "required": {
+                "float": ("FLOAT", {"default": 1.0, "min": float_info.min, "max": float_info.max, "step": 0.01}),
+            }
+        }
 
     def get_float(self, float):
         return (float,)
 
 class CfgLiteral:
     RETURN_TYPES = ("FLOAT",)
+    RETURN_NAMES = ("value",)
     FUNCTION = "get_float"
+
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Provides CFG value between 0.0 and 100.0"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"float": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0})}}
+        return {
+            "required": {
+                "float": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0}),
+            }
+        }
 
     def get_float(self, float):
         return (float,)
 
 class CheckpointLoaderWithName:
-    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING",)
-    RETURN_NAMES = ("MODEL", "CLIP", "VAE", "modelname")
+    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING")
+    RETURN_NAMES = ("MODEL", "CLIP", "VAE", "model_name")
     FUNCTION = "load_checkpoint"
 
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Loads Model, CLIP and VAE from a checkpoint"
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"ckpt_name": (folder_paths.get_filename_list("checkpoints"), ),}}
+        return {
+            "required": {
+                "ckpt_name": (folder_paths.get_filename_list("checkpoints"),),
+            }
+        }
 
     def load_checkpoint(self, ckpt_name, output_vae=True, output_clip=True):
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
@@ -157,92 +200,115 @@ class CheckpointLoaderWithName:
         return out
 
 class SamplerSelector:
-    CATEGORY = 'ImageSaver/utils'
     RETURN_TYPES = (comfy.samplers.KSampler.SAMPLERS, "STRING")
-    RETURN_NAMES = ("sampler", "sampler_name")
+    RETURN_NAMES = ("sampler",                        "sampler_name")
     FUNCTION = "get_names"
+
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides one of the available ComfyUI samplers'
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"sampler_name": (comfy.samplers.KSampler.SAMPLERS,)}}
+        return {
+            "required": {
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
+            }
+        }
 
     def get_names(self, sampler_name):
         return (sampler_name, sampler_name)
 
 class SchedulerSelector:
-    CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], "STRING",)
-    RETURN_NAMES = ("scheduler", "scheduler_name")
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], "STRING")
+    RETURN_NAMES = ("scheduler",                                                                                "scheduler_name")
     FUNCTION = "get_names"
+
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides one of the standard ComfyUI plus some extra schedulers'
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
+        return {
+            "required": {
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],),
+            }
+        }
 
     def get_names(self, scheduler):
         return (scheduler, scheduler)
 
 class SchedulerSelectorComfy:
-    CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING",)
-    RETURN_NAMES = ("scheduler", "scheduler_name")
+    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING")
+    RETURN_NAMES = ("scheduler",                        "scheduler_name")
     FUNCTION = "get_names"
+
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides one of the standard ComfyUI schedulers'
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
-
-    def get_names(self, scheduler):
-        return (scheduler, scheduler)
-
-class SchedulerSelectorComfy:
-    CATEGORY = 'ImageSaver/utils'
-    RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING",)
-    RETURN_NAMES = ("scheduler", "scheduler_name")
-    FUNCTION = "get_names"
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
+        return {
+            "required": {
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS,),
+            }
+        }
 
     def get_names(self, scheduler):
         return (scheduler, scheduler)
 
 class SchedulerToString:
-    CATEGORY = 'ImageSaver/utils'
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("scheduler_name",)
     FUNCTION = "get_name"
 
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides a given sandard ComfyUI or some extra scheduler\'s name as string'
+
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],)}}
+        return {
+            "required": {
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],),
+            }
+        }
 
     def get_name(self, scheduler):
         return (scheduler,)
 
 class SchedulerComfyToString:
-    CATEGORY = 'ImageSaver/utils'
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("scheduler_name",)
     FUNCTION = "get_name"
 
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides a given sandard ComfyUI scheduler\'s name as string'
+
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"scheduler": (comfy.samplers.KSampler.SCHEDULERS,)}}
+        return {
+            "required": {
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS,),
+            }
+        }
 
     def get_name(self, scheduler):
         return (scheduler,)
 
 class SamplerToString:
-    CATEGORY = 'ImageSaver/utils'
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("sampler_name",)
     FUNCTION = "get_name"
 
+    CATEGORY = 'ImageSaver/utils'
+    DESCRIPTION = 'Provides a given sandard ComfyUI samplers\'s name as string'
+
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required": {"sampler": (comfy.samplers.KSampler.SAMPLERS,)}}
+        return {
+            "required": {
+                "sampler": (comfy.samplers.KSampler.SAMPLERS,),
+            }
+        }
 
     def get_name(self, sampler):
         return (sampler,)
@@ -292,34 +358,34 @@ class ImageSaver:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "images": ("IMAGE", ),
-                "filename": ("STRING", {"default": f'%time_%basemodelname_%seed', "multiline": False}),
-                "path": ("STRING", {"default": '', "multiline": False}),
-                "extension": (['png', 'jpeg', 'webp'],),
+                "images":                ("IMAGE",),
+                "filename":              ("STRING",  {"default": f'%time_%basemodelname_%seed', "multiline": False}),
+                "path":                  ("STRING",  {"default": '', "multiline": False}),
+                "extension":             (['png', 'jpeg', 'webp'],),
             },
             "optional": {
-                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0}),
-                "modelname": ("STRING", {"default": '', "multiline": False}),
-                "sampler_name": ("STRING", {"default": '', "multiline": False}),
-                "scheduler": ("STRING", {"default": 'normal', "multiline": False}),
-                "positive": ("STRING", {"default": 'unknown', "multiline": True}),
-                "negative": ("STRING", {"default": 'unknown', "multiline": True}),
-                "seed_value": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "width": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                "height": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                "lossless_webp": ("BOOLEAN", {"default": True}),
-                "quality_jpeg_or_webp": ("INT", {"default": 100, "min": 1, "max": 100}),
-                "optimize_png": ("BOOLEAN", {"default": False}),
-                "counter": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff }),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
-                "time_format": ("STRING", {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
+                "steps":                 ("INT",     {"default": 20, "min": 1, "max": 10000}),
+                "cfg":                   ("FLOAT",   {"default": 7.0, "min": 0.0, "max": 100.0}),
+                "modelname":             ("STRING",  {"default": '', "multiline": False}),
+                "sampler_name":          ("STRING",  {"default": '', "multiline": False}),
+                "scheduler":             ("STRING",  {"default": 'normal', "multiline": False}),
+                "positive":              ("STRING",  {"default": 'unknown', "multiline": True}),
+                "negative":              ("STRING",  {"default": 'unknown', "multiline": True}),
+                "seed_value":            ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "width":                 ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                "height":                ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                "lossless_webp":         ("BOOLEAN", {"default": True}),
+                "quality_jpeg_or_webp":  ("INT",     {"default": 100, "min": 1, "max": 100}),
+                "optimize_png":          ("BOOLEAN", {"default": False}),
+                "counter":               ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "denoise":               ("FLOAT",   {"default": 1.0, "min": 0.0, "max": 1.0}),
+                "time_format":           ("STRING",  {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False}),
                 "embed_workflow_in_png": ("BOOLEAN", {"default": True}),
             },
             "hidden": {
                 "prompt": "PROMPT",
-                "extra_pnginfo": "EXTRA_PNGINFO"
+                "extra_pnginfo": "EXTRA_PNGINFO",
             },
         }
 
@@ -329,35 +395,35 @@ class ImageSaver:
     OUTPUT_NODE = True
 
     CATEGORY = "ImageSaver"
+    DESCRIPTION = "Save images with civitai-compatible generation metadata"
 
     def save_files(
-            self,
-            images,
-            seed_value,
-            steps,
-            cfg,
-            sampler_name,
-            scheduler,
-            positive,
-            negative,
-            modelname,
-            quality_jpeg_or_webp,
-            lossless_webp,
-            optimize_png,
-            width,
-            height,
-            counter,
-            filename,
-            path,
-            extension,
-            time_format,
-            denoise,
-            save_workflow_as_json=False,
-            embed_workflow_in_png=True,
-            prompt=None,
-            extra_pnginfo=None,
+        self,
+        images,
+        seed_value,
+        steps,
+        cfg,
+        sampler_name,
+        scheduler,
+        positive,
+        negative,
+        modelname,
+        quality_jpeg_or_webp,
+        lossless_webp,
+        optimize_png,
+        width,
+        height,
+        counter,
+        filename,
+        path,
+        extension,
+        time_format,
+        denoise,
+        save_workflow_as_json=False,
+        embed_workflow_in_png=True,
+        prompt=None,
+        extra_pnginfo=None,
     ):
-
         filename = make_filename(filename, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise)
         path = make_pathname(path, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise)
         ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
