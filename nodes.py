@@ -76,7 +76,7 @@ class SeedGenerator:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "tooltip": "seed as integer number"}),
             }
         }
 
@@ -94,7 +94,7 @@ class StringLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "string": ("STRING", {"default": "", "multiline": True}),
+                "string": ("STRING", {"default": "", "multiline": True, "tooltip": "string"}),
             }
         }
 
@@ -113,7 +113,7 @@ class SizeLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                "int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8, "tooltip": "dimension as integer (in steps of 8)"}),
             }
         }
 
@@ -131,7 +131,7 @@ class IntLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "int": ("INT", {"default": 0, "min": 0, "max": 1000000}),
+                "int": ("INT", {"default": 0, "min": 0, "max": 1000000, "tooltip": "integer number"}),
             }
         }
 
@@ -149,7 +149,7 @@ class FloatLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "float": ("FLOAT", {"default": 1.0, "min": float_info.min, "max": float_info.max, "step": 0.01}),
+                "float": ("FLOAT", {"default": 1.0, "min": float_info.min, "max": float_info.max, "step": 0.01, "tooltip": "floating point number"}),
             }
         }
 
@@ -168,7 +168,7 @@ class CfgLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "float": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0}),
+                "float": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "tooltip": "CFG as a floating point number"}),
             }
         }
 
@@ -187,7 +187,7 @@ class CheckpointLoaderWithName:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"),),
+                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), {"tooltip": "checkpoint"}),
             }
         }
 
@@ -211,7 +211,7 @@ class SamplerSelector:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, {"tooltip": "sampler (Comfy's standard)"}),
             }
         }
 
@@ -230,7 +230,7 @@ class SchedulerSelector:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], {"tooltip": "scheduler (Comfy's standard + extras)"}),
             }
         }
 
@@ -249,7 +249,7 @@ class SchedulerSelectorComfy:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS,),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {"tooltip": "scheduler (Comfy's standard)"}),
             }
         }
 
@@ -268,7 +268,7 @@ class SchedulerToString:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'],),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], {"tooltip": "scheduler (Comfy's standard + extras)"}),
             }
         }
 
@@ -287,7 +287,7 @@ class SchedulerComfyToString:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS,),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {"tooltip": "scheduler (Comfy's standard)"}),
             }
         }
 
@@ -306,7 +306,7 @@ class SamplerToString:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "sampler": (comfy.samplers.KSampler.SAMPLERS,),
+                "sampler": (comfy.samplers.KSampler.SAMPLERS, {"tooltip": "sampler (Comfy's standard)"}),
             }
         }
 
@@ -358,30 +358,30 @@ class ImageSaver:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "images":                ("IMAGE",),
-                "filename":              ("STRING",  {"default": f'%time_%basemodelname_%seed', "multiline": False}),
-                "path":                  ("STRING",  {"default": '', "multiline": False}),
-                "extension":             (['png', 'jpeg', 'webp'],),
+                "images":                ("IMAGE",   {                                                             "tooltip": "image(s) to save"}),
+                "filename":              ("STRING",  {"default": '%time_%basemodelname_%seed', "multiline": False, "tooltip": "filename (available variables: %date, %time, %model, %seed, %counter, %sampler_name, %steps, %cfg, %scheduler, %basemodelname, %denoise)"}),
+                "path":                  ("STRING",  {"default": '', "multiline": False,                           "tooltip": "path to save the images (under Comfy's save directory)"}),
+                "extension":             (['png', 'jpeg', 'webp'], {                                               "tooltip": "file extension/type to save image as"}),
             },
             "optional": {
-                "steps":                 ("INT",     {"default": 20, "min": 1, "max": 10000}),
-                "cfg":                   ("FLOAT",   {"default": 7.0, "min": 0.0, "max": 100.0}),
-                "modelname":             ("STRING",  {"default": '', "multiline": False}),
-                "sampler_name":          ("STRING",  {"default": '', "multiline": False}),
-                "scheduler":             ("STRING",  {"default": 'normal', "multiline": False}),
-                "positive":              ("STRING",  {"default": 'unknown', "multiline": True}),
-                "negative":              ("STRING",  {"default": 'unknown', "multiline": True}),
-                "seed_value":            ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "width":                 ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                "height":                ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                "lossless_webp":         ("BOOLEAN", {"default": True}),
-                "quality_jpeg_or_webp":  ("INT",     {"default": 100, "min": 1, "max": 100}),
-                "optimize_png":          ("BOOLEAN", {"default": False}),
-                "counter":               ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "denoise":               ("FLOAT",   {"default": 1.0, "min": 0.0, "max": 1.0}),
-                "time_format":           ("STRING",  {"default": "%Y-%m-%d-%H%M%S", "multiline": False}),
-                "save_workflow_as_json": ("BOOLEAN", {"default": False}),
-                "embed_workflow_in_png": ("BOOLEAN", {"default": True}),
+                "steps":                 ("INT",     {"default": 20, "min": 1, "max": 10000,                       "tooltip": "number of steps"}),
+                "cfg":                   ("FLOAT",   {"default": 7.0, "min": 0.0, "max": 100.0,                    "tooltip": "CFG value"}),
+                "modelname":             ("STRING",  {"default": '', "multiline": False,                           "tooltip": "model name"}),
+                "sampler_name":          ("STRING",  {"default": '', "multiline": False,                           "tooltip": "sampler name (as string)"}),
+                "scheduler":             ("STRING",  {"default": 'normal', "multiline": False,                     "tooltip": "scheduler name (as string)"}),
+                "positive":              ("STRING",  {"default": 'unknown', "multiline": True,                     "tooltip": "positive prompt"}),
+                "negative":              ("STRING",  {"default": 'unknown', "multiline": True,                     "tooltip": "negative prompt"}),
+                "seed_value":            ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff,           "tooltip": "seed"}),
+                "width":                 ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8,  "tooltip": "image width"}),
+                "height":                ("INT",     {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8,  "tooltip": "image height"}),
+                "lossless_webp":         ("BOOLEAN", {"default": True,                                             "tooltip": "if True, saved WEBP files will be lossless"}),
+                "quality_jpeg_or_webp":  ("INT",     {"default": 100, "min": 1, "max": 100,                        "tooltip": "quality setting of JPEG/WEBP"}),
+                "optimize_png":          ("BOOLEAN", {"default": False,                                            "tooltip": "if True, saved PNG files will be optimized (can reduce file size but is slower)"}),
+                "counter":               ("INT",     {"default": 0, "min": 0, "max": 0xffffffffffffffff,           "tooltip": "counter"}),
+                "denoise":               ("FLOAT",   {"default": 1.0, "min": 0.0, "max": 1.0,                      "tooltip": "denoise value"}),
+                "time_format":           ("STRING",  {"default": "%Y-%m-%d-%H%M%S", "multiline": False,            "tooltip": "timestamp format"}),
+                "save_workflow_as_json": ("BOOLEAN", {"default": False,                                            "tooltip": "if True, saves the workflow as a separate JSON file, in addition to saving the image"}),
+                "embed_workflow_in_png": ("BOOLEAN", {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved PNG file (if saving as PNG)"}),
             },
             "hidden": {
                 "prompt": "PROMPT",
