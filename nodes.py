@@ -67,6 +67,7 @@ def make_filename(filename, seed, modelname, counter, time_format, sampler_name,
 
 class SeedGenerator:
     RETURN_TYPES = ("INT",)
+    OUTPUT_TOOLTIPS = ("seed (INT)",)
     FUNCTION = "get_seed"
 
     CATEGORY = "ImageSaver/utils"
@@ -85,6 +86,7 @@ class SeedGenerator:
 
 class StringLiteral:
     RETURN_TYPES = ("STRING",)
+    OUTPUT_TOOLTIPS = ("string (STRING)",)
     FUNCTION = "get_string"
 
     CATEGORY = "ImageSaver/utils"
@@ -103,7 +105,8 @@ class StringLiteral:
 
 class SizeLiteral:
     RETURN_TYPES = ("INT",)
-    RETURN_NAMES = ("dimension",)
+    RETURN_NAMES = ("size",)
+    OUTPUT_TOOLTIPS = ("size (INT)",)
     FUNCTION = "get_int"
 
     CATEGORY = "ImageSaver/utils"
@@ -113,7 +116,7 @@ class SizeLiteral:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8, "tooltip": "dimension as integer (in steps of 8)"}),
+                "int": ("INT", {"default": 512, "min": 0, "max": MAX_RESOLUTION, "step": 8, "tooltip": "size as integer (in steps of 8)"}),
             }
         }
 
@@ -122,6 +125,7 @@ class SizeLiteral:
 
 class IntLiteral:
     RETURN_TYPES = ("INT",)
+    OUTPUT_TOOLTIPS = ("int (INT)",)
     FUNCTION = "get_int"
 
     CATEGORY = "ImageSaver/utils"
@@ -140,6 +144,7 @@ class IntLiteral:
 
 class FloatLiteral:
     RETURN_TYPES = ("FLOAT",)
+    OUTPUT_TOOLTIPS = ("float (FLOAT)",)
     FUNCTION = "get_float"
 
     CATEGORY = "ImageSaver/utils"
@@ -159,6 +164,7 @@ class FloatLiteral:
 class CfgLiteral:
     RETURN_TYPES = ("FLOAT",)
     RETURN_NAMES = ("value",)
+    OUTPUT_TOOLTIPS = ("cfg (FLOAT)",)
     FUNCTION = "get_float"
 
     CATEGORY = "ImageSaver/utils"
@@ -178,10 +184,11 @@ class CfgLiteral:
 class CheckpointLoaderWithName:
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "STRING")
     RETURN_NAMES = ("MODEL", "CLIP", "VAE", "model_name")
+    OUTPUT_TOOLTIPS = ("U-Net model (denoising latents)", "CLIP (Contrastive Language-Image Pre-Training) model (encoding text prompts)", "VAE (Variational autoencoder) model (latent<->pixel encoding/decoding)", "checkpoint name")
     FUNCTION = "load_checkpoint"
 
     CATEGORY = "ImageSaver/utils"
-    DESCRIPTION = "Loads Model, CLIP and VAE from a checkpoint"
+    DESCRIPTION = "Loads U-Net model, CLIP model and VAE model from a checkpoint file"
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -202,6 +209,7 @@ class CheckpointLoaderWithName:
 class SamplerSelector:
     RETURN_TYPES = (comfy.samplers.KSampler.SAMPLERS, "STRING")
     RETURN_NAMES = ("sampler",                        "sampler_name")
+    OUTPUT_TOOLTIPS = ("sampler (SAMPLERS)", "sampler name (STRING)")
     FUNCTION = "get_names"
 
     CATEGORY = 'ImageSaver/utils'
@@ -221,6 +229,7 @@ class SamplerSelector:
 class SchedulerSelector:
     RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'], "STRING")
     RETURN_NAMES = ("scheduler",                                                                                "scheduler_name")
+    OUTPUT_TOOLTIPS = ("scheduler (SCHEDULERS + ['AYS SDXL', 'AYS SD1', 'AYS SVD', 'GITS[coeff=1.2]'])", "scheduler name (STRING)")
     FUNCTION = "get_names"
 
     CATEGORY = 'ImageSaver/utils'
@@ -240,6 +249,7 @@ class SchedulerSelector:
 class SchedulerSelectorComfy:
     RETURN_TYPES = (comfy.samplers.KSampler.SCHEDULERS, "STRING")
     RETURN_NAMES = ("scheduler",                        "scheduler_name")
+    OUTPUT_TOOLTIPS = ("scheduler (SCHEDULERS)", "scheduler name (STRING)")
     FUNCTION = "get_names"
 
     CATEGORY = 'ImageSaver/utils'
@@ -259,6 +269,7 @@ class SchedulerSelectorComfy:
 class SchedulerToString:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("scheduler_name",)
+    OUTPUT_TOOLTIPS = ("scheduler name (STRING)",)
     FUNCTION = "get_name"
 
     CATEGORY = 'ImageSaver/utils'
@@ -278,6 +289,7 @@ class SchedulerToString:
 class SchedulerComfyToString:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("scheduler_name",)
+    OUTPUT_TOOLTIPS = ("scheduler name (STRING)",)
     FUNCTION = "get_name"
 
     CATEGORY = 'ImageSaver/utils'
@@ -297,6 +309,7 @@ class SchedulerComfyToString:
 class SamplerToString:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("sampler_name",)
+    OUTPUT_TOOLTIPS = ("sampler name (STRING)",)
     FUNCTION = "get_name"
 
     CATEGORY = 'ImageSaver/utils'
