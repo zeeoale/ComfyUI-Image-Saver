@@ -1,6 +1,12 @@
-# unreleased
+# v1.4.0
 
+- Add UNETLoaderWithName
+- Also check the unet directory (if not found in checkpoints) when calculating model hash
+- Add tooltips
+- Image Saver: Add clip skip parameter
+- Adds the suffix _0x to the file name if a file with that name already exists (#40)
 - Remove strip_a1111_params option
+- Bugfix: Fixing the outputs names of SchedulerToString, SchedulerComfyToString and SamplerToString nodes
 
 # v1.3.0
 

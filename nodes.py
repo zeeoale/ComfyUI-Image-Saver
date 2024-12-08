@@ -209,16 +209,22 @@ class CheckpointLoaderWithName:
         return out
 
 class UNETLoaderWithName:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
-                              "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
-                             }}
     RETURN_TYPES = ("MODEL", "STRING")
     RETURN_NAMES = ("model", "filename")
+    OUTPUT_TOOLTIPS = ("U-Net model (denoising latents)", "model filename")
     FUNCTION = "load_unet"
 
     CATEGORY = "ImageSaver/utils"
+    DESCRIPTION = "Loads U-Net model and outputs it's filename"
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "unet_name": (folder_paths.get_filename_list("diffusion_models"),),
+                "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
+            }
+        }
 
     def load_unet(self, unet_name, weight_dtype):
         model_options = {}
