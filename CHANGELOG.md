@@ -1,3 +1,7 @@
+# v1.5.1
+
+- Fix workflow storage in lossless webp
+
 # v1.5.0
 
 - New lines are no longer removed from prompts.
