@@ -125,7 +125,7 @@ class ImageSaver:
                 "clip_skip":             ("INT",     {"default": 0, "min": -24, "max": 24,                         "tooltip": "skip last CLIP layers (positive or negative value, 0 for no skip)"}),
                 "time_format":           ("STRING",  {"default": "%Y-%m-%d-%H%M%S", "multiline": False,            "tooltip": "timestamp format"}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False,                                            "tooltip": "if True, also saves the workflow as a separate JSON file"}),
-                "embed_workflow_in_png": ("BOOLEAN", {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved PNG and WEBP files (but not in JPEG)"}),
+                "embed_workflow_in_png": ("BOOLEAN", {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved PNG files"}),
                 "additional_hashes":     ("STRING",  {"default": "", "multiline": False,                           "tooltip": "hashes separated by commas, optionally with names. 'Name:HASH' (e.g., 'MyLoRA:FF735FF83F98')"}),
             },
             "hidden": {
@@ -253,12 +253,15 @@ class ImageSaver:
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+
             current_filename_prefix = self.get_unique_filename(output_path, filename_prefix, extension)
+            filename = f"{current_filename_prefix}.{extension}"
+            filepath = os.path.join(output_path, filename)
+
             if extension == 'png':
                 metadata = PngInfo()
                 metadata.add_text("parameters", a111_params)
 
-                # embed workflow and prompt json only if embed_workflow_in_png is true
                 if embed_workflow_in_png:
                     if prompt is not None:
                         metadata.add_text("prompt", json.dumps(prompt))
@@ -266,35 +269,15 @@ class ImageSaver:
                         for x in extra_pnginfo:
                             metadata.add_text(x, json.dumps(extra_pnginfo[x]))
 
-                filename = f"{current_filename_prefix}.png"
-                img.save(os.path.join(output_path, filename), pnginfo=metadata, optimize=optimize_png)
-            else:
-                filename = f"{current_filename_prefix}.{extension}"
-                file = os.path.join(output_path, filename)
-
-                # First, save the image without any EXIF metadata
-                img.save(file, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
-
-                # Ensure exif_dict is always initialized
-                exif_dict = {"Exif": {}, "0th": {}}
-
-                # Store metadata in both JPEG & WEBP
-                exif_dict["Exif"][piexif.ExifIFD.UserComment] = piexif.helper.UserComment.dump(a111_params, encoding="unicode")
-
-                # Only store workflow metadata in WEBP (not JPEG)
-                if extension == "webp" and extra_pnginfo is not None and "workflow" in extra_pnginfo:
-                    workflow_str = "Workflow:" + json.dumps(extra_pnginfo["workflow"], ensure_ascii=False)
-                    exif_dict["0th"][0x010E] = workflow_str.encode("utf-8")
-
-                # Store prompt metadata for both JPEG & WEBP
-                if prompt is not None:
-                    prompt_str = "Prompt:" + json.dumps(prompt, ensure_ascii=False)
-                    exif_dict["0th"][0x010F] = prompt_str.encode("utf-8")
-
-                # Convert exif_dict to bytes only if it contains data
-                if exif_dict["Exif"] or exif_dict["0th"]:
-                    exif_bytes = piexif.dump(exif_dict)
-                    piexif.insert(exif_bytes, file)
+                img.save(filepath, pnginfo=metadata, optimize=optimize_png)
+            else: # webp & jpeg
+                img.save(filepath, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
+                exif_bytes = piexif.dump({
+                    "Exif": {
+                        piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
+                    },
+                })
+                piexif.insert(exif_bytes, filepath)
 
             if save_workflow_as_json:
                 save_json(extra_pnginfo, os.path.join(output_path, current_filename_prefix))
