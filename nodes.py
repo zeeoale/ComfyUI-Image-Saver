@@ -5,7 +5,7 @@ import json
 import requests
 import piexif
 import piexif.helper
-from PIL import Image
+from PIL import Image, ExifTags
 from PIL.PngImagePlugin import PngInfo
 import numpy as np
 import re
@@ -130,7 +130,7 @@ class ImageSaver:
                 "clip_skip":             ("INT",     {"default": 0, "min": -24, "max": 24,                         "tooltip": "skip last CLIP layers (positive or negative value, 0 for no skip)"}),
                 "time_format":           ("STRING",  {"default": "%Y-%m-%d-%H%M%S", "multiline": False,            "tooltip": "timestamp format"}),
                 "save_workflow_as_json": ("BOOLEAN", {"default": False,                                            "tooltip": "if True, also saves the workflow as a separate JSON file"}),
-                "embed_workflow_in_png": ("BOOLEAN", {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved PNG files"}),
+                "embed_workflow":        ("BOOLEAN", {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved image files"}),
                 "additional_hashes":     ("STRING",  {"default": "", "multiline": False,                           "tooltip": "hashes separated by commas, optionally with names. 'Name:HASH' (e.g., 'MyLoRA:FF735FF83F98')\nWith download_civitai_data set to true, weights can be added as well. (e.g., 'HASH:Weight', 'Name:HASH:Weight')"}),
                 "download_civitai_data": ("BOOLEAN", {"default": True,                                             "tooltip": "Download and cache data from civitai.com to save correct metadata. Allows LoRA weights to be saved to the metadata."}),
                 "easy_remix":            ("BOOLEAN", {"default": True,                                             "tooltip": "Strip LoRAs and simplify 'embedding:path' from the prompt to make the Remix option on civitai.com more seamless."}),
@@ -180,9 +180,9 @@ class ImageSaver:
         clip_skip,
         additional_hashes="",
         save_workflow_as_json=False,
-        embed_workflow_in_png=True,
-        download_civitai_data=False,
-        easy_remix=False,
+        embed_workflow=True,
+        download_civitai_data=True,
+        easy_remix=True,
         prompt=None,
         extra_pnginfo=None,
     ):
@@ -321,12 +321,12 @@ class ImageSaver:
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png)
+        filenames = self.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow)
 
         subfolder = os.path.normpath(path)
         return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
 
-    def save_images(self, images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow_in_png) -> list[str]:
+    def save_images(self, images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow) -> list[str]:
         paths = list()
         for image in images:
             i = 255. * image.cpu().numpy()
@@ -340,17 +340,31 @@ class ImageSaver:
                 metadata = PngInfo()
                 metadata.add_text("parameters", a111_params)
 
-                if embed_workflow_in_png:
-                    if prompt is not None:
-                        metadata.add_text("prompt", json.dumps(prompt))
+                if embed_workflow:
                     if extra_pnginfo is not None:
-                        for x in extra_pnginfo:
-                            metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+                        for k, v in extra_pnginfo.items():
+                            metadata.add_text(k, json.dumps(v, separators=(',', ':')))
+                    if prompt is not None:
+                        metadata.add_text("prompt", json.dumps(prompt, separators=(',', ':')))
 
                 img.save(filepath, pnginfo=metadata, optimize=optimize_png)
             else: # webp & jpeg
                 img.save(filepath, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
-                exif_bytes = piexif.dump({
+
+                # Native example adding workflow to exif:
+                # https://github.com/comfyanonymous/ComfyUI/blob/095610717000bffd477a7e72988d1fb2299afacb/comfy_extras/nodes_images.py#L113
+                # Potential error: size of Exif section exceeds 65535
+                ifd_0th = {}
+                if embed_workflow:
+                    if extra_pnginfo is not None:
+                        ifd_0th.update((piexif.ImageIFD.Make - i, f"{k}:{json.dumps(v, separators=(',', ':'))}") for i, (k, v) in enumerate(extra_pnginfo.items()))
+                    if prompt is not None:
+                        ifd_0th[piexif.ImageIFD.Model] = f"prompt:{json.dumps(prompt, separators=(',', ':'))}"
+
+                exif_bytes = piexif.dump(({
+                    "0th": ifd_0th
+                    } if ifd_0th else {}) |
+                    {
                     "Exif": {
                         piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
                     },
