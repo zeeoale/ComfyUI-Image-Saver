@@ -1,3 +1,11 @@
+# v1.6.0
+
+- Add Civitai download option for LoRA weight saving (#68).
+- Add easy_remix option for stripping LoRAs from prompt (#68).
+- Add width/height filename variables (#67).
+- Add progress bar for sha256 calculation (#70).
+- Add "jpg" extension to the list for more control over the target filename (#69).
+
 # v1.5.2
 
 - Reverted experimental webp support for the moment. Needs more testing.
