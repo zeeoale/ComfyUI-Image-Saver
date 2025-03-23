@@ -20,9 +20,9 @@ app.registerExtension({
                         try {
                             const description = `${value.description}`;
                             if (workflow === undefined && description.slice(0, workflowString.length).toLowerCase() === workflowString) {
-                                workflow = JSON.parse(description.substring(workflowString.length));
+                                workflow = JSON.parse(description.slice(workflowString.length));
                             } else if (prompt === undefined && description.slice(0, promptString.length).toLowerCase() === promptString) {
-                                prompt = JSON.parse(description.substring(promptString.length));
+                                prompt = JSON.parse(description.slice(promptString.length));
                             }
                         } catch (error) {
                             if (!(error instanceof SyntaxError)) {

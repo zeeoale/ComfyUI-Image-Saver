@@ -363,8 +363,7 @@ class ImageSaver:
 
                 exif_bytes = piexif.dump(({
                     "0th": ifd_0th
-                    } if ifd_0th else {}) |
-                    {
+                    } if ifd_0th else {}) | {
                     "Exif": {
                         piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
                     },
