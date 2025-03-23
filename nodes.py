@@ -5,7 +5,7 @@ import json
 import requests
 import piexif
 import piexif.helper
-from PIL import Image, ExifTags
+from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 import numpy as np
 import re
