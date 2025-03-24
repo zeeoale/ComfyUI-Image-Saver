@@ -1,3 +1,9 @@
+# v1.7.0
+
+- Add hash output for optional chaining of additional hashes.
+- Add tests for image saving.
+- Fix f-string failure.
+
 # v1.6.0
 
 - Add Civitai download option for LoRA weight saving (#68).
