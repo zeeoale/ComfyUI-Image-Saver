@@ -353,21 +353,37 @@ class ImageSaver:
 
                 # Native example adding workflow to exif:
                 # https://github.com/comfyanonymous/ComfyUI/blob/095610717000bffd477a7e72988d1fb2299afacb/comfy_extras/nodes_images.py#L113
-                # Potential error: size of Exif section exceeds 65535
-                ifd_0th = {}
+                pnginfo_json = {}
+                prompt_json = {}
                 if embed_workflow:
                     if extra_pnginfo is not None:
-                        ifd_0th.update((piexif.ImageIFD.Make - i, f"{k}:{json.dumps(v, separators=(',', ':'))}") for i, (k, v) in enumerate(extra_pnginfo.items()))
+                        pnginfo_json = {piexif.ImageIFD.Make - i: f"{k}:{json.dumps(v, separators=(',', ':'))}" for i, (k, v) in enumerate(extra_pnginfo.items())}
                     if prompt is not None:
-                        ifd_0th[piexif.ImageIFD.Model] = f"prompt:{json.dumps(prompt, separators=(',', ':'))}"
+                        prompt_json = {piexif.ImageIFD.Model: f"prompt:{json.dumps(prompt, separators=(',', ':'))}"}
 
-                exif_bytes = piexif.dump(({
-                    "0th": ifd_0th
-                    } if ifd_0th else {}) | {
-                    "Exif": {
-                        piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
-                    },
-                })
+                def get_exif_bytes() -> bytes:
+                    return piexif.dump(({
+                        "0th": pnginfo_json | prompt_json
+                        } if pnginfo_json or prompt_json else {}) | {
+                        "Exif": {
+                            piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
+                        },
+                    })
+
+                exif_bytes = get_exif_bytes()
+
+                # JPEG format limits the EXIF bytes to a maximum of 65535 bytes
+                if extension == "jpg" or extension == "jpeg":
+                    MAX_EXIF_SIZE = 65535
+                    if len(exif_bytes) > MAX_EXIF_SIZE:
+                        print("ComfyUI-Image-Saver: Error: Workflow is too large, removing client request prompt.")
+                        prompt_json = {}
+                        exif_bytes = get_exif_bytes()
+                        if len(exif_bytes) > MAX_EXIF_SIZE:
+                            print("ComfyUI-Image-Saver: Error: Workflow is still too large, cannot embed workflow!")
+                            pnginfo_json = {}
+                            exif_bytes = get_exif_bytes()
+
                 piexif.insert(exif_bytes, filepath)
 
             if save_workflow_as_json:
