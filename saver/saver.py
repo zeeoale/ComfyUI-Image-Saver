@@ -52,5 +52,8 @@ def save_image(image, filepath, extension, quality_jpeg_or_webp, lossless_webp, 
                     print("ComfyUI-Image-Saver: Error: Workflow is still too large, cannot embed workflow!")
                     pnginfo_json = {}
                     exif_bytes = get_exif_bytes()
+                    if len(exif_bytes) > MAX_EXIF_SIZE:
+                        print("ComfyUI-Image-Saver: Error: Prompt exceeds maximum size for JPEG. Cannot save metadata.")
+                        return
 
         piexif.insert(exif_bytes, filepath)
