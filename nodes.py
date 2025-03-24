@@ -6,10 +6,10 @@ import requests
 import piexif
 import piexif.helper
 from PIL import Image
-from PIL.PngImagePlugin import PngInfo
 import numpy as np
 import re
 import folder_paths
+from .saver.saver import save_image
 from .utils import get_sha256
 from .prompt_metadata_extractor import PromptMetadataExtractor
 from nodes import MAX_RESOLUTION
@@ -141,7 +141,9 @@ class ImageSaver:
             },
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("hashes",)
+    OUTPUT_TOOLTIPS = ("Comma-separated list of the hashes to chain with other Image Saver additional_hashes",)
     FUNCTION = "save_files"
 
     OUTPUT_NODE = True
@@ -265,11 +267,11 @@ class ImageSaver:
                     # Optional data - modelName, versionName
                     resource_data["modelName"] = civitai_info["model"]["name"]
                     resource_data["versionName"] = civitai_info["name"]
-                    
+
                     # Weight/strength (for LoRA or embedding)
                     if weight is not None:
                         resource_data["weight"] = weight
-                    
+
                     # Required data - AIR or modelVersionId (unique resource identifier)
                     # https://github.com/civitai/civitai/wiki/AIR-%E2%80%90-Uniform-Resource-Names-for-AI
                     if "air" in civitai_info:
@@ -306,9 +308,15 @@ class ImageSaver:
 
         positive_a111_params = positive.strip()
         negative_a111_params = f"\nNegative prompt: {negative.strip()}"
-        a111_params = (f"{positive_a111_params}{negative_a111_params}\nSteps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}"
-            f", Size: {width}x{height}{f', Clip skip: {abs(clip_skip)}' if clip_skip != 0 else ''}{f', Model hash: {add_model_hash}' if add_model_hash else ''}"
-            f", Model: {basemodelname}{f', Hashes: {json.dumps(hashes, separators=(',', ':'))}' if hashes else ''}, Version: ComfyUI")
+        clip_skip_str = f", Clip skip: {abs(clip_skip)}" if clip_skip != 0 else ""
+        model_hash_str = f", Model hash: {add_model_hash}" if add_model_hash else ""
+        hashes_str = f", Hashes: {json.dumps(hashes, separators=(',', ':'))}" if hashes else ""
+
+        a111_params = (
+            f"{positive_a111_params}{negative_a111_params}\n"
+            f"Steps: {steps}, Sampler: {civitai_sampler_name}, CFG scale: {cfg}, Seed: {seed_value}, "
+            f"Size: {width}x{height}{clip_skip_str}{model_hash_str}, Model: {basemodelname}{hashes_str}, Version: ComfyUI"
+        )
 
         # Add Civitai resource listing
         if download_civitai_data and civitai_resources:
@@ -324,7 +332,11 @@ class ImageSaver:
         filenames = self.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow)
 
         subfolder = os.path.normpath(path)
-        return {"ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)}}
+
+        return {
+            "result": (",".join(f"{Path(name.split(":")[-1]).stem + ":" if name else ""}{hash}{":" + str(weight) if weight is not None and download_civitai_data else ""}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items()),),
+            "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
+        }
 
     def save_images(self, images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow) -> list[str]:
         paths = list()
@@ -336,55 +348,7 @@ class ImageSaver:
             filename = f"{current_filename_prefix}.{extension}"
             filepath = os.path.join(output_path, filename)
 
-            if extension == 'png':
-                metadata = PngInfo()
-                metadata.add_text("parameters", a111_params)
-
-                if embed_workflow:
-                    if extra_pnginfo is not None:
-                        for k, v in extra_pnginfo.items():
-                            metadata.add_text(k, json.dumps(v, separators=(',', ':')))
-                    if prompt is not None:
-                        metadata.add_text("prompt", json.dumps(prompt, separators=(',', ':')))
-
-                img.save(filepath, pnginfo=metadata, optimize=optimize_png)
-            else: # webp & jpeg
-                img.save(filepath, optimize=True, quality=quality_jpeg_or_webp, lossless=lossless_webp)
-
-                # Native example adding workflow to exif:
-                # https://github.com/comfyanonymous/ComfyUI/blob/095610717000bffd477a7e72988d1fb2299afacb/comfy_extras/nodes_images.py#L113
-                pnginfo_json = {}
-                prompt_json = {}
-                if embed_workflow:
-                    if extra_pnginfo is not None:
-                        pnginfo_json = {piexif.ImageIFD.Make - i: f"{k}:{json.dumps(v, separators=(',', ':'))}" for i, (k, v) in enumerate(extra_pnginfo.items())}
-                    if prompt is not None:
-                        prompt_json = {piexif.ImageIFD.Model: f"prompt:{json.dumps(prompt, separators=(',', ':'))}"}
-
-                def get_exif_bytes() -> bytes:
-                    return piexif.dump(({
-                        "0th": pnginfo_json | prompt_json
-                        } if pnginfo_json or prompt_json else {}) | {
-                        "Exif": {
-                            piexif.ExifIFD.UserComment: piexif.helper.UserComment.dump(a111_params, encoding="unicode")
-                        },
-                    })
-
-                exif_bytes = get_exif_bytes()
-
-                # JPEG format limits the EXIF bytes to a maximum of 65535 bytes
-                if extension == "jpg" or extension == "jpeg":
-                    MAX_EXIF_SIZE = 65535
-                    if len(exif_bytes) > MAX_EXIF_SIZE:
-                        print("ComfyUI-Image-Saver: Error: Workflow is too large, removing client request prompt.")
-                        prompt_json = {}
-                        exif_bytes = get_exif_bytes()
-                        if len(exif_bytes) > MAX_EXIF_SIZE:
-                            print("ComfyUI-Image-Saver: Error: Workflow is still too large, cannot embed workflow!")
-                            pnginfo_json = {}
-                            exif_bytes = get_exif_bytes()
-
-                piexif.insert(exif_bytes, filepath)
+            save_image(img, filepath, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, a111_params, prompt, extra_pnginfo, embed_workflow)
 
             if save_workflow_as_json:
                 save_json(extra_pnginfo, os.path.join(output_path, current_filename_prefix))
@@ -455,7 +419,7 @@ class ImageSaver:
                     content = ImageSaver.download_model_info(path, model_hash)
                     if content is None:
                         return None
-                    
+
                     # dynamically receive filename from the website to save the metadata
                     file = next((file for file in content["files"] if any(len(value) <= ImageSaver.MAX_HASH_LENGTH and value.upper() == model_hash.upper() for value in file["hashes"].values())), None)
                     if file is None:
@@ -508,7 +472,8 @@ class ImageSaver:
 
     @staticmethod
     def download_model_info(path: Path | str | None, model_hash: str) -> dict | None:
-        print(f"ComfyUI-Image-Saver: Downloading model info. for '{model_hash if path is None else f"{Path(path).stem}:{model_hash}"}'.")
+        model_label = model_hash if path is None else f"{Path(path).stem}:{model_hash}"
+        print(f"ComfyUI-Image-Saver: Downloading model info for '{model_label}'.")
 
         content = ImageSaver.http_get_json(f'https://civitai.com/api/v1/model-versions/by-hash/{model_hash.upper()}')
         if content is None:
@@ -525,7 +490,7 @@ class ImageSaver:
 
         if path is not None:
             ImageSaver.save_civitai_info_file(content, path)
-        
+
         return content
 
     @staticmethod
