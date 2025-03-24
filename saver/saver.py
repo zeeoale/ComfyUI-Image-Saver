@@ -44,7 +44,7 @@ def save_image(image, filepath, extension, quality_jpeg_or_webp, lossless_webp, 
         # JPEG format limits the EXIF bytes to a maximum of 65535 bytes
         if extension == "jpg" or extension == "jpeg":
             MAX_EXIF_SIZE = 65535
-            if len(exif_bytes) > MAX_EXIF_SIZE:
+            if len(exif_bytes) > MAX_EXIF_SIZE and embed_workflow:
                 print("ComfyUI-Image-Saver: Error: Workflow is too large, removing client request prompt.")
                 prompt_json = {}
                 exif_bytes = get_exif_bytes()
@@ -52,8 +52,8 @@ def save_image(image, filepath, extension, quality_jpeg_or_webp, lossless_webp, 
                     print("ComfyUI-Image-Saver: Error: Workflow is still too large, cannot embed workflow!")
                     pnginfo_json = {}
                     exif_bytes = get_exif_bytes()
-                    if len(exif_bytes) > MAX_EXIF_SIZE:
-                        print("ComfyUI-Image-Saver: Error: Prompt exceeds maximum size for JPEG. Cannot save metadata.")
-                        return
+            if len(exif_bytes) > MAX_EXIF_SIZE:
+                print("ComfyUI-Image-Saver: Error: Prompt exceeds maximum size for JPEG. Cannot save metadata.")
+                return
 
         piexif.insert(exif_bytes, filepath)
