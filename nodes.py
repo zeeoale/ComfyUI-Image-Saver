@@ -334,7 +334,7 @@ class ImageSaver:
         subfolder = os.path.normpath(path)
 
         return {
-            "result": (",".join(f"{Path(name.split(":")[-1]).stem + ":" if name else ""}{hash}{":" + str(weight) if weight is not None and download_civitai_data else ""}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items()),),
+            "result": (",".join(f"{Path(name.split(':')[-1]).stem + ':' if name else ''}{hash}{':' + str(weight) if weight is not None and download_civitai_data else ''}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items()),),
             "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
 
