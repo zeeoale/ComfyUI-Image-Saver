@@ -1,13 +1,29 @@
 import { app } from '../../scripts/app.js'
 import { ExifReader } from './lib/exif-reader.js' // https://github.com/mattiasw/ExifReader v4.26.2
 
+const SETTING_CATEGORY_NAME = "Image Saver";
+const SETTING_SECTION_FILE_HANDLING = "File Handling";
+
 app.registerExtension({
     name: "ComfyUI-Image-Saver",
+    settings: [
+        {
+            id: "ImageSaver.HandleImageWorkflowDrop",
+            name: "Use a custom file drop handler to load workflows from JPEG and WEBP files",
+            type: "boolean",
+            defaultValue: true,
+            category: [SETTING_CATEGORY_NAME, SETTING_SECTION_FILE_HANDLING, "Custom File Drop Handler"],
+            tooltip:
+                "Use a custom file handler for dropped JPEG and WEBP files.\n" +
+                "This is needed to load embedded workflows.\n" +
+                "Only disable this if it interferes with another extension's file drop handler.",
+        },
+    ],
     async setup() {
         // Save original function, reassign to our own handler
         const handleFileOriginal = app.handleFile;
         app.handleFile = async function (file) {
-            if (file.type === "image/jpeg" || file.type === "image/webp") {
+            if (app.ui.settings.getSettingValue("ImageSaver.HandleImageWorkflowDrop") && (file.type === "image/jpeg" || file.type === "image/webp")) {
                 try {
                     const exifTags = await ExifReader.load(file);
 
