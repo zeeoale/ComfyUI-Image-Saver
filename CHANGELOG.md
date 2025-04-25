@@ -1,9 +1,13 @@
+# v1.9.0
+
+- Allow multiple comma-separated model names
+- Add debug a111_params output
+
 # v1.8.0
 
 - Allow workflow embed for all file formats.
 - Added optional version field for Civitai Hash Fetcher.
 - Added InputParameters node to simplify common KSampler parameters input.
-
 
 # v1.7.0
 
