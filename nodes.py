@@ -211,8 +211,8 @@ class ImageSaver:
         civitai_resources, hashes, add_model_hash = ImageSaver.get_civitai_metadata(modelname, ckpt_path, modelhash, loras, embeddings, manual_entries, download_civitai_data)
 
         if easy_remix:
-            positive = ImageSaver.clean_prompt(positive)
-            negative = ImageSaver.clean_prompt(negative)
+            positive = ImageSaver.clean_prompt(positive, metadata_extractor)
+            negative = ImageSaver.clean_prompt(negative, metadata_extractor)
 
         positive_a111_params = positive.strip()
         negative_a111_params = f"\nNegative prompt: {negative.strip()}"
