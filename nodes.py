@@ -188,6 +188,19 @@ class ImageSaver:
         prompt=None,
         extra_pnginfo=None,
     ):
+        model_names = [m.strip() for m in modelname.split(',')]
+        modelname = model_names[0] # Use the first model as the primary one
+
+        # Process additional model names and add to additional_hashes
+        for additional_model in model_names[1:]:
+            additional_ckpt_path = full_checkpoint_path_for(additional_model)
+            if additional_ckpt_path:
+                additional_modelhash = get_sha256(additional_ckpt_path)[:10]
+                # Add to additional_hashes in "name:HASH" format
+                if additional_hashes:
+                    additional_hashes += ","
+                additional_hashes += f"{additional_model}:{additional_modelhash}"
+
         filename = make_filename(filename, width, height, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise, clip_skip)
         path = make_pathname(path, width, height, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise, clip_skip)
 
@@ -241,10 +254,10 @@ class ImageSaver:
 
         subfolder = os.path.normpath(path)
 
-        result = ",".join(f"{Path(name.split(':')[-1]).stem + ':' if name else ''}{hash}{':' + str(weight) if weight is not None and download_civitai_data else ''}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items())
+        final_hashes = ",".join(f"{Path(name.split(':')[-1]).stem + ':' if name else ''}{hash}{':' + str(weight) if weight is not None and download_civitai_data else ''}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items())
 
         return {
-            "result": (result, a111_params),
+            "result": (final_hashes, a111_params),
             "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
 
