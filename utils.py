@@ -64,11 +64,8 @@ def full_embedding_path_for(embedding: str):
 Based on a lora name, e.g., 'epi_noise_offset2', finds the path as known in comfy, including extension.
 """
 def full_lora_path_for(lora: str):
-    # Find the position of the last dot
     last_dot_position = lora.rfind('.')
-    # Get the extension including the dot
     extension = lora[last_dot_position:] if last_dot_position != -1 else ""
-    # Check if the extension is supported, if not, add .safetensors
     if extension not in folder_paths.supported_pt_extensions:
         lora += ".safetensors"
 
@@ -84,3 +81,26 @@ def __list_loras():
 
 def __list_embeddings():
     return folder_paths.get_filename_list("embeddings")
+
+def full_checkpoint_path_for(model_name: str):
+    last_dot_position = model_name.rfind('.')
+    extension = model_name[last_dot_position:] if last_dot_position != -1 else ""
+    if extension not in folder_paths.supported_pt_extensions:
+        model_name += ".safetensors"
+
+    matching_checkpoint = next((x for x in __list_checkpoints() if x.endswith(model_name)), None)
+    if matching_checkpoint:
+        return folder_paths.get_full_path("checkpoints", matching_checkpoint)
+
+    matching_model = next((x for x in __list_diffusion_models() if x.endswith(model_name)), None)
+    if matching_model:
+        return folder_paths.get_full_path("diffusion_models", matching_model)
+
+    print(f'Could not find full path to checkpoint "{model_name}"')
+    return None
+
+def __list_checkpoints():
+    return folder_paths.get_filename_list("checkpoints")
+
+def __list_diffusion_models():
+    return folder_paths.get_filename_list("diffusion_models")

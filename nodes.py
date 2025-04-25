@@ -10,7 +10,7 @@ import numpy as np
 import re
 import folder_paths
 from .saver.saver import save_image
-from .utils import get_sha256
+from .utils import get_sha256, full_checkpoint_path_for
 from .prompt_metadata_extractor import PromptMetadataExtractor
 from nodes import MAX_RESOLUTION
 
@@ -190,11 +190,8 @@ class ImageSaver:
     ):
         filename = make_filename(filename, width, height, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise, clip_skip)
         path = make_pathname(path, width, height, seed_value, modelname, counter, time_format, sampler_name, steps, cfg, scheduler, denoise, clip_skip)
-        ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
 
-        if not ckpt_path:
-            ckpt_path = folder_paths.get_full_path("diffusion_models", modelname)
-
+        ckpt_path = full_checkpoint_path_for(modelname)
         if ckpt_path:
             modelhash = get_sha256(ckpt_path)[:10]
         else:
@@ -240,7 +237,7 @@ class ImageSaver:
                 print(f'The path `{output_path.strip()}` specified doesn\'t exist! Creating directory.')
                 os.makedirs(output_path, exist_ok=True)
 
-        filenames = self.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow)
+        filenames = ImageSaver.save_images(images, output_path, filename, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow)
 
         subfolder = os.path.normpath(path)
 
@@ -249,13 +246,14 @@ class ImageSaver:
             "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
 
-    def save_images(self, images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow) -> list[str]:
+    @staticmethod
+    def save_images(images, output_path, filename_prefix, a111_params, extension, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow) -> list[str]:
         paths = list()
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
 
-            current_filename_prefix = self.get_unique_filename(output_path, filename_prefix, extension)
+            current_filename_prefix = ImageSaver.get_unique_filename(output_path, filename_prefix, extension)
             filename = f"{current_filename_prefix}.{extension}"
             filepath = os.path.join(output_path, filename)
 
@@ -374,7 +372,8 @@ class ImageSaver:
         prompt = re.sub(r'\b[A-Z]+\([^)]*\)', "", prompt)
         return prompt
 
-    def get_unique_filename(self, output_path, filename_prefix, extension):
+    @staticmethod
+    def get_unique_filename(output_path, filename_prefix, extension):
         existing_files = [f for f in os.listdir(output_path) if f.startswith(filename_prefix) and f.endswith(extension)]
 
         if not existing_files:
