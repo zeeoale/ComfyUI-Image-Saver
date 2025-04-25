@@ -141,9 +141,9 @@ class ImageSaver:
             },
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("hashes",)
-    OUTPUT_TOOLTIPS = ("Comma-separated list of the hashes to chain with other Image Saver additional_hashes",)
+    RETURN_TYPES = ("STRING","STRING")
+    RETURN_NAMES = ("hashes","a1111_params")
+    OUTPUT_TOOLTIPS = ("Comma-separated list of the hashes to chain with other Image Saver additional_hashes","Written parameters to the image metadata")
     FUNCTION = "save_files"
 
     OUTPUT_NODE = True
@@ -241,8 +241,10 @@ class ImageSaver:
 
         subfolder = os.path.normpath(path)
 
+        result = ",".join(f"{Path(name.split(':')[-1]).stem + ':' if name else ''}{hash}{':' + str(weight) if weight is not None and download_civitai_data else ''}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items())
+
         return {
-            "result": (",".join(f"{Path(name.split(':')[-1]).stem + ':' if name else ''}{hash}{':' + str(weight) if weight is not None and download_civitai_data else ''}" for name, (_, weight, hash) in ({ modelname: ( ckpt_path, None, modelhash ) } | loras | embeddings | manual_entries).items()),),
+            "result": (result, a111_params),
             "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
 
