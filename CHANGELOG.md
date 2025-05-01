@@ -1,3 +1,7 @@
+# v1.9.1
+
+- Bugfix: handle network connection error for civitai
+
 # v1.9.0
 
 - Allow multiple comma-separated model names
