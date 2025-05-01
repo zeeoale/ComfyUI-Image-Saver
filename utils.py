@@ -99,6 +99,9 @@ def http_get_json(url: str) -> dict | None:
     except TimeoutError:
         print(f"ComfyUI-Image-Saver: HTTP GET Request timed out for {url}")
         return None
+    except requests.exceptions.ConnectionError as e:
+        print(f"ComfyUI-Image-Saver: Warning - Network connection error for {url}: {e}")
+        return None
 
     if not response.ok:
         print(f"ComfyUI-Image-Saver: HTTP GET Request failed with error code: {response.status_code}: {response.reason}")
