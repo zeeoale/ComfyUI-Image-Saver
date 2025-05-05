@@ -1,3 +1,7 @@
+# v1.9.2
+
+- Do not override proxy settings of requests.get
+
 # v1.9.1
 
 - Bugfix: handle network connection error for civitai
