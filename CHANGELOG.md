@@ -1,3 +1,8 @@
+# v1.10.0
+
+- Provide 'Image Saver Simple' & 'Image Saver Metadata' that can be used together, separating metadata node from image saver node
+- `scheduler` input has been renamed to `scheduler_name`
+
 # v1.9.2
 
 - Do not override proxy settings of requests.get
