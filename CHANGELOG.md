@@ -1,3 +1,7 @@
+# v1.10.1
+
+- Fix regression with path handling
+
 # v1.10.0
 
 - Provide 'Image Saver Simple' & 'Image Saver Metadata' that can be used together, separating metadata node from image saver node
