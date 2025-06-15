@@ -238,6 +238,8 @@ class ImageSaverSimple:
         if metadata is None:
             metadata = Metadata('', '', '', 512, 512, 0, 20, 7.0, '', 'normal', 1.0, 0, '', '', '', '')
 
+        path = make_pathname(path, metadata.width, metadata.height, metadata.seed, metadata.modelname, counter, time_format, metadata.sampler_name, metadata.steps, metadata.cfg, metadata.scheduler_name, metadata.denoise, metadata.clip_skip)
+
         filenames = ImageSaver.save_images(images, filename, extension, path, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow, counter, time_format, metadata)
 
         subfolder = os.path.normpath(path)
@@ -330,6 +332,8 @@ class ImageSaver:
     ) -> dict[str, Any]:
         metadata = ImageSaverMetadata.make_metadata(modelname, positive, negative, width, height, seed_value, steps, cfg, sampler_name, scheduler_name, denoise, clip_skip, additional_hashes, download_civitai_data, easy_remix)
 
+        path = make_pathname(path, metadata.width, metadata.height, metadata.seed, metadata.modelname, counter, time_format, metadata.sampler_name, metadata.steps, metadata.cfg, metadata.scheduler_name, metadata.denoise, metadata.clip_skip)
+
         filenames = ImageSaver.save_images(images, filename, extension, path, quality_jpeg_or_webp, lossless_webp, optimize_png, prompt, extra_pnginfo, save_workflow_as_json, embed_workflow, counter, time_format, metadata)
 
         subfolder = os.path.normpath(path)
@@ -344,7 +348,7 @@ class ImageSaver:
         images: list[torch.Tensor],
         filename_pattern: str,
         extension: str,
-        path_pattern: str,
+        path: str,
         quality_jpeg_or_webp: int,
         lossless_webp: bool,
         optimize_png: bool,
@@ -357,7 +361,6 @@ class ImageSaver:
         metadata: Metadata
     ) -> list[str]:
         filename_prefix = make_filename(filename_pattern, metadata.width, metadata.height, metadata.seed, metadata.modelname, counter, time_format, metadata.sampler_name, metadata.steps, metadata.cfg, metadata.scheduler_name, metadata.denoise, metadata.clip_skip)
-        path = make_pathname(path_pattern, metadata.width, metadata.height, metadata.seed, metadata.modelname, counter, time_format, metadata.sampler_name, metadata.steps, metadata.cfg, metadata.scheduler_name, metadata.denoise, metadata.clip_skip)
 
         output_path = os.path.join(folder_paths.output_directory, path)
 
