@@ -197,6 +197,7 @@ class ImageSaverSimple:
                 "optimize_png":          ("BOOLEAN",  {"default": False,                                            "tooltip": "if True, saved PNG files will be optimized (can reduce file size but is slower)"}),
                 "embed_workflow":        ("BOOLEAN",  {"default": True,                                             "tooltip": "if True, embeds the workflow in the saved image files.\nStable for PNG, experimental for WEBP.\nJPEG experimental and only if metadata size is below 65535 bytes"}),
                 "save_workflow_as_json": ("BOOLEAN",  {"default": False,                                            "tooltip": "if True, also saves the workflow as a separate JSON file"}),
+                "show_preview":          ("BOOLEAN",  {"default": True,                                             "tooltip": "if True, displays saved images in the UI preview"}),
             },
             "optional": {
                 "metadata":              ("METADATA", {"default": None,                                             "tooltip": "metadata to embed in the image"}),
@@ -229,6 +230,7 @@ class ImageSaverSimple:
         optimize_png: bool,
         embed_workflow: bool = True,
         save_workflow_as_json: bool = False,
+        show_preview: bool = True,
         metadata: Metadata | None = None,
         counter: int = 0,
         time_format: str = "%Y-%m-%d-%H%M%S",
@@ -244,10 +246,14 @@ class ImageSaverSimple:
 
         subfolder = os.path.normpath(path)
 
-        return {
+        result: dict[str, Any] = {
             "result": (metadata.final_hashes, metadata.a111_params),
-            "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
+
+        if show_preview:
+            result["ui"] = {"images": [{"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'} for filename in filenames]}
+
+        return result
 
 class ImageSaver:
     @classmethod
@@ -282,6 +288,7 @@ class ImageSaver:
                 "additional_hashes":     ("STRING",  {"default": "", "multiline": False,                           "tooltip": "hashes separated by commas, optionally with names. 'Name:HASH' (e.g., 'MyLoRA:FF735FF83F98')\nWith download_civitai_data set to true, weights can be added as well. (e.g., 'HASH:Weight', 'Name:HASH:Weight')"}),
                 "download_civitai_data": ("BOOLEAN", {"default": True,                                             "tooltip": "Download and cache data from civitai.com to save correct metadata. Allows LoRA weights to be saved to the metadata."}),
                 "easy_remix":            ("BOOLEAN", {"default": True,                                             "tooltip": "Strip LoRAs and simplify 'embedding:path' from the prompt to make the Remix option on civitai.com more seamless."}),
+                "show_preview":          ("BOOLEAN", {"default": True,                                             "tooltip": "if True, displays saved images in the UI preview"}),
             },
             "hidden": {
                 "prompt": "PROMPT",
@@ -327,6 +334,7 @@ class ImageSaver:
         additional_hashes: str = "",
         download_civitai_data: bool = True,
         easy_remix: bool = True,
+        show_preview: bool = True,
         prompt: dict[str, Any] | None = None,
         extra_pnginfo: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
@@ -338,10 +346,14 @@ class ImageSaver:
 
         subfolder = os.path.normpath(path)
 
-        return {
+        result: dict[str, Any] = {
             "result": (metadata.final_hashes, metadata.a111_params),
-            "ui": {"images": map(lambda filename: {"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'}, filenames)},
         }
+
+        if show_preview:
+            result["ui"] = {"images": [{"filename": filename, "subfolder": subfolder if subfolder != '.' else '', "type": 'output'} for filename in filenames]}
+
+        return result
 
     @staticmethod
     def save_images(
