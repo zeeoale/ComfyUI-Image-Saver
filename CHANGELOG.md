@@ -1,3 +1,7 @@
+# v1.11.1
+
+- Place preview switch at the end
+
 # v1.11.0
 
 - Allow disabling the previews
