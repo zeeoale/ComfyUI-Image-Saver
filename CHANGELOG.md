@@ -1,3 +1,7 @@
+# v1.11.0
+
+- Allow disabling the previews
+
 # v1.10.1
 
 - Fix regression with path handling
