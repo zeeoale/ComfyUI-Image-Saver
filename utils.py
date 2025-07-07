@@ -75,20 +75,26 @@ def full_checkpoint_path_for(model_name: str) -> str:
     if not model_name:
         return ''
 
-    last_dot_position = model_name.rfind('.')
-    extension = model_name[last_dot_position:] if last_dot_position != -1 else ""
-    if extension not in folder_paths.supported_pt_extensions:
-        model_name += ".safetensors"
+    # Non aggiungiamo estensioni forzate
+    base_name = os.path.basename(model_name)
 
-    matching_checkpoint = next((x for x in __list_checkpoints() if x.endswith(model_name)), None)
+    # 1. Cerca in checkpoints/
+    matching_checkpoint = next((x for x in __list_checkpoints() if x.endswith(base_name)), None)
     if matching_checkpoint:
         return folder_paths.get_full_path("checkpoints", matching_checkpoint)
 
-    matching_model = next((x for x in __list_diffusion_models() if x.endswith(model_name)), None)
+    # 2. Cerca in diffusion_models/
+    matching_model = next((x for x in __list_diffusion_models() if x.endswith(base_name)), None)
     if matching_model:
         return folder_paths.get_full_path("diffusion_models", matching_model)
 
-    print(f'Could not find full path to checkpoint "{model_name}"')
+    # 3. Cerca in models/unet/
+    unet_folder = os.path.join(folder_paths.models_dir, "unet")
+    for file in os.listdir(unet_folder):
+        if file.endswith(base_name):
+            return os.path.join(unet_folder, file)
+
+    print(f'[⚠] Could not find full path to checkpoint "{model_name}"')
     return ''
 
 def __list_checkpoints() -> list[str]:
